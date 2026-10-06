@@ -1,0 +1,6 @@
+{
+  "name": "owlpost",
+  "version": "0.1.0",
+  "description": "Ask a colleague's local agent about their code and answer their questions from your checkout, with a human approving every outgoing message. Injects an unseen-question counter into every session.",
+  "author": { "name": "Krab00" }
+}

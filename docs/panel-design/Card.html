@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>owlpost — Card</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:#ffffff}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+input{outline:none}input::placeholder{color:#8b919c}
+a:focus-visible,button:focus-visible{outline:1px solid #d97757}
+</style>
+</head>
+<body>
+<div style="width: 580px; height: 880px; box-sizing: border-box; padding: 20px 2ch; background: #1f2229; color: #dfe1e5; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; line-height: 20px; display: flex; flex-direction: column; overflow: hidden">
+<nav aria-label="owlpost tabs" style="display: flex; flex-wrap: wrap; column-gap: 2ch; align-items: center">
+<a href="Main.html" style="color: #8b919c"><span style="color: #d97757">1:</span> Chats <span style="background: #d97757; color: #1f2229; font-weight: 700; padding: 0 1ch">3</span></a>
+<a href="Contacts.html" style="color: #8b919c"><span style="color: #d97757">2:</span> Contacts</a>
+<a href="New.html" style="color: #8b919c"><span style="color: #d97757">3:</span> New</a>
+<a href="Card.html" aria-current="page" style="background: #d97757; color: #1f2229; font-weight: 700; padding: 0 1ch">Card</a>
+<a href="Settings.html" style="color: #8b919c"><span style="color: #d97757">5:</span> Settings</a>
+<span style="flex: 1"></span>
+<button aria-label="Close panel" style="color: #8b919c"><span style="color: #d97757">q:</span> ×</button>
+</nav>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<main style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-wrap: wrap; column-gap: 2ch">
+<h1 style="margin: 0; font: inherit; font-weight: 700">My card</h1>
+<span style="color: #8b919c">what a colleague's agent learns about this machine</span>
+</div>
+<dl style="margin: 0; display: flex; flex-direction: column">
+<div style="display: flex"><dt style="width: 14ch; flex: none; color: #8b919c">Name</dt><dd style="margin: 0; font-weight: 700">Alex Carter</dd></div>
+<div style="display: flex"><dt style="width: 14ch; flex: none; color: #8b919c">E-mail</dt><dd style="margin: 0">[your e-mail]</dd></div>
+<div style="display: flex"><dt style="width: 14ch; flex: none; color: #8b919c">Fingerprint</dt><dd style="margin: 0">owl:4kd9s2mfq7wz1xrt</dd></div>
+<div style="display: flex"><dt style="width: 14ch; flex: none; color: #8b919c">Public key</dt><dd style="margin: 0">ed25519:[public key]</dd></div>
+<div style="display: flex"><dt style="width: 14ch; flex: none; color: #8b919c">Transport</dt><dd style="margin: 0">iroh, pinned to this key</dd></div>
+<div style="display: flex"><dt style="width: 14ch; flex: none; color: #8b919c">Projects</dt><dd style="margin: 0">github.com/Krab00/owl-post</dd></div>
+<div style="display: flex"><dt style="width: 14ch; flex: none; color: #8b919c">Answers</dt><dd style="margin: 0"><span style="color: #98c379">yes</span>, a human approves every answer</dd></div>
+<div style="display: flex"><dt style="width: 14ch; flex: none; color: #8b919c">Harness</dt><dd style="margin: 0">claude</dd></div>
+<div style="display: flex"><dt style="width: 14ch; flex: none; color: #8b919c">Daemon</dt><dd style="margin: 0"><span style="color: #98c379">●</span> reachable at 127.0.0.1:7411</dd></div>
+</dl>
+<section style="display: flex; flex-direction: column">
+<h2 style="margin: 0; font: inherit; font-weight: 700; color: #8b919c">Share</h2>
+<div style="color: #8b919c">Send your peer file to a colleague; they add it with /owlpost:add.</div>
+<div style="display: flex; flex-wrap: wrap; column-gap: 2ch">
+<button style="color: #d97757; font-weight: 700"><span style="color: #d97757">y:</span> Copy peer file</button>
+<button><span style="color: #d97757">e:</span> Export to a file</button>
+<button><span style="color: #d97757">j:</span> Show raw JSON</button>
+</div>
+</section>
+<section style="display: flex; flex-direction: column">
+<h2 style="margin: 0; font: inherit; font-weight: 700; color: #8b919c">A colleague's card</h2>
+<div style="color: #8b919c">Open one from Contacts with <span style="color: #d97757">k</span>, or fetch it by name, e-mail or fingerprint:</div>
+<label for="card-peer" style="color: #8b919c">Peer</label>
+<input id="card-peer" type="text" placeholder="name, e-mail or fingerprint" style="font: inherit; color: #dfe1e5; background: transparent; border: 1px solid #3a3f4b; height: 40px; padding: 0 1ch; box-sizing: border-box; width: 100%">
+</section>
+</main>
+<div style="height: 20px; color: #8b919c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">✓ peer file copied</div>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<div style="color: #8b919c; display: flex; flex-wrap: wrap; column-gap: 2ch"><span style="color: #8b919c; font-weight: 700">keys</span><span><span style="color: #dfe1e5">y</span> copy peer file</span><span><span style="color: #dfe1e5">e</span> export</span><span><span style="color: #dfe1e5">j</span> raw JSON</span><span><span style="color: #dfe1e5">h</span> keys</span><span><span style="color: #dfe1e5">esc</span> prompt</span></div>
+</div>
+</body>
+</html>

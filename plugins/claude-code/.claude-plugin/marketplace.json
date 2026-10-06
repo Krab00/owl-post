@@ -1,0 +1,11 @@
+{
+  "name": "owlpost-local",
+  "owner": { "name": "Krab00" },
+  "plugins": [
+    {
+      "name": "owlpost",
+      "source": "./",
+      "description": "owlpost harness adapter for Claude Code: unseen-question counter hook, owlpost skill, /owlpost:inbox, /owlpost:ask, /owlpost:history."
+    }
+  ]
+}

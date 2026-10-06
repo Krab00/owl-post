@@ -1,0 +1,144 @@
+name: release
+
+# Builds `owl` for the four supported targets, packs each as owl-<version>-<target>.tar.gz,
+# writes SHA256SUMS over the four tarballs and, on a `v*` tag, attaches everything to a GitHub
+# release. `workflow_dispatch` on any branch is the dry run: same build, same artifacts
+# uploaded to the workflow run, no release created (design §11).
+#
+# Linux aarch64 is cross-compiled with cargo-zigbuild (zig as the C compiler and linker, no
+# Docker, glibc floor 2.17) so both Linux targets build on one ubuntu runner; both macOS targets
+# build natively on the arm64 macOS runner with --target.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to package as (e.g. v0.1.0). Empty: Cargo.toml version + '-dry'."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.v.outputs.tag }}
+      version: ${{ steps.v.outputs.version }}
+      publish: ${{ steps.v.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -eu
+          cargo_ver=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n 1)
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            tag="$GITHUB_REF_NAME"
+            version="${tag#v}"
+            if [ "$version" != "$cargo_ver" ]; then
+              echo "::error::tag $tag does not match Cargo.toml version $cargo_ver"
+              exit 1
+            fi
+            publish=true
+          else
+            tag="${INPUT_TAG:-v${cargo_ver}-dry}"
+            version="${tag#v}"
+            publish=false
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "publish=$publish" >> "$GITHUB_OUTPUT"
+          echo "packaging owl $version as $tag (publish=$publish)"
+
+  build:
+    needs: meta
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            os: macos-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            zig: true
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            zig: true
+    runs-on: ${{ matrix.os }}
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+      TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Install cargo-zigbuild
+        if: matrix.zig
+        run: pip install cargo-zigbuild
+      - name: Build (cargo-zigbuild)
+        if: matrix.zig
+        run: cargo zigbuild --release --locked --target "${TARGET}.2.17"
+      - name: Build (cargo)
+        if: ${{ !matrix.zig }}
+        run: cargo build --release --locked --target "$TARGET"
+      - name: Package
+        run: |
+          set -eu
+          asset="owl-${VERSION}-${TARGET}.tar.gz"
+          tar -C "target/${TARGET}/release" -czf "$asset" owl
+          ls -l "$asset"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: owl-${{ env.VERSION }}-${{ matrix.target }}
+          path: owl-${{ env.VERSION }}-${{ matrix.target }}.tar.gz
+          if-no-files-found: error
+
+  checksums:
+    needs: [meta, build]
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: owl-*
+          merge-multiple: true
+      - name: Write SHA256SUMS
+        run: |
+          set -eu
+          cd dist
+          count=$(ls owl-*.tar.gz | wc -l)
+          if [ "$count" -ne 4 ]; then
+            echo "::error::expected 4 tarballs, found $count"
+            ls -l
+            exit 1
+          fi
+          sha256sum owl-*.tar.gz > SHA256SUMS
+          cat SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SHA256SUMS
+          path: dist/SHA256SUMS
+          if-no-files-found: error
+      - name: Create GitHub release
+        if: needs.meta.outputs.publish == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.meta.outputs.tag }}
+          name: owl ${{ needs.meta.outputs.version }}
+          files: |
+            dist/owl-*.tar.gz
+            dist/SHA256SUMS
+          fail_on_unmatched_files: true

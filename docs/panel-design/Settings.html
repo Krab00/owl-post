@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>owlpost — Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:#ffffff}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+input{outline:none}input::placeholder{color:#8b919c}
+a:focus-visible,button:focus-visible{outline:1px solid #d97757}
+</style>
+</head>
+<body>
+<div style="width: 580px; height: 880px; box-sizing: border-box; padding: 20px 2ch; background: #1f2229; color: #dfe1e5; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; line-height: 20px; display: flex; flex-direction: column; overflow: hidden">
+<nav aria-label="owlpost tabs" style="display: flex; flex-wrap: wrap; column-gap: 2ch; align-items: center">
+<a href="Main.html" style="color: #8b919c"><span style="color: #d97757">1:</span> Chats <span style="background: #d97757; color: #1f2229; font-weight: 700; padding: 0 1ch">3</span></a>
+<a href="Contacts.html" style="color: #8b919c"><span style="color: #d97757">2:</span> Contacts</a>
+<a href="New.html" style="color: #8b919c"><span style="color: #d97757">3:</span> New</a>
+<a href="Card.html" style="color: #8b919c"><span style="color: #d97757">4:</span> Card</a>
+<a href="Settings.html" aria-current="page" style="background: #d97757; color: #1f2229; font-weight: 700; padding: 0 1ch">Settings</a>
+<span style="flex: 1"></span>
+<button aria-label="Close panel" style="color: #8b919c"><span style="color: #d97757">q:</span> ×</button>
+</nav>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<main style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 20px">
+<section style="display: flex; flex-direction: column">
+<h2 style="margin: 0; font: inherit; font-weight: 700; color: #8b919c">Inbox</h2>
+<div style="display: flex"><span style="width: 2ch; flex: none"></span><span style="width: 24ch; flex: none">Live watch</span><span style="display: flex; column-gap: 1ch"><button aria-pressed="true" style="background: #dfe1e5; color: #1f2229; padding: 0 1ch">on</button><button aria-pressed="false" style="color: #8b919c; padding: 0 1ch">off</button></span></div>
+<div style="display: flex; color: #8b919c"><span style="width: 26ch; flex: none"></span><span>wake new sessions when a message arrives</span></div>
+<div style="display: flex"><span style="width: 2ch; flex: none"></span><span style="width: 24ch; flex: none">Band above the prompt</span><span style="display: flex; column-gap: 1ch"><button aria-pressed="true" style="background: #dfe1e5; color: #1f2229; padding: 0 1ch">on</button><button aria-pressed="false" style="color: #8b919c; padding: 0 1ch">off</button></span></div>
+<div style="display: flex; color: #8b919c"><span style="width: 26ch; flex: none"></span><span>shows the unseen count and opens this panel</span></div>
+</section>
+<section style="display: flex; flex-direction: column">
+<div style="display: flex; column-gap: 1ch; color: #8b919c"><h2 style="margin: 0; font: inherit; font-weight: 700; color: #8b919c">Harnesses</h2><span>who writes the draft you approve</span></div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+<li style="display: flex; white-space: nowrap"><span style="width: 2ch; flex: none"></span><span style="width: 10ch; flex: none">claude</span><span style="flex: 1; min-width: 0; color: #8b919c; overflow: hidden; text-overflow: ellipsis">claude</span><span style="flex: none; display: flex; column-gap: 1ch"><span style="color: #98c379">✓ found</span><span style="background: #dfe1e5; color: #1f2229; padding: 0 1ch">drafts</span></span></li>
+<li style="background: #2a2e37; display: flex; flex-direction: column">
+<div style="display: flex; white-space: nowrap"><span style="width: 2ch; flex: none; color: #d97757">▸</span><span style="width: 10ch; flex: none">codex</span><span style="flex: 1; min-width: 0; color: #8b919c; overflow: hidden; text-overflow: ellipsis">codex</span><span style="flex: none; color: #98c379">✓ found</span></div>
+<div style="display: flex"><span style="width: 2ch; flex: none"></span><span style="display: flex; flex-wrap: wrap; column-gap: 2ch"><button><span style="color: #d97757">enter:</span> Use for drafts</button><button><span style="color: #d97757">e:</span> Edit command</button><button style="color: #e06c75"><span style="color: #d97757">x:</span> Remove</button></span></div>
+</li>
+<li style="display: flex; white-space: nowrap"><span style="width: 2ch; flex: none"></span><span style="width: 10ch; flex: none">opencode</span><span style="flex: 1; min-width: 0; color: #8b919c; overflow: hidden; text-overflow: ellipsis">opencode</span><span style="flex: none; color: #98c379">✓ found</span></li>
+<li style="display: flex; white-space: nowrap"><span style="width: 2ch; flex: none"></span><span style="width: 10ch; flex: none">fake</span><span style="flex: 1; min-width: 0; color: #8b919c; overflow: hidden; text-overflow: ellipsis">tests/fixtures/fake-harness.sh</span><span style="flex: none; color: #e5c07b">warn not found</span></li>
+</ul>
+<div style="display: flex"><span style="width: 2ch; flex: none"></span><span style="display: flex; flex-wrap: wrap; column-gap: 2ch"><button><span style="color: #d97757">s:</span> Scan PATH for harnesses</button><button><span style="color: #d97757">a:</span> Add harness</button></span></div>
+</section>
+<section style="display: flex; flex-direction: column">
+<h2 style="margin: 0; font: inherit; font-weight: 700; color: #8b919c">Daemon</h2>
+<div style="display: flex"><span style="width: 2ch; flex: none"></span><span style="width: 24ch; flex: none">Service</span><span><span style="color: #98c379">●</span> reachable at 127.0.0.1:7411</span></div>
+<div style="display: flex"><span style="width: 26ch; flex: none"></span><span style="display: flex; column-gap: 2ch"><button><span style="color: #d97757">i:</span> Reinstall</button><button style="color: #e06c75"><span style="color: #d97757">x:</span> Uninstall</button></span></div>
+<div style="display: flex"><span style="width: 2ch; flex: none"></span><span style="width: 24ch; flex: none">Last pull</span><span>19s ago · 2 open asks · 1 peer probed</span></div>
+</section>
+<section style="display: flex; flex-direction: column">
+<h2 style="margin: 0; font: inherit; font-weight: 700; color: #8b919c">Doctor</h2>
+<div style="display: flex"><span style="width: 2ch; flex: none"></span><span style="width: 24ch; flex: none"><button><span style="color: #d97757">d:</span> Run doctor</button></span><span style="color: #8b919c">last run just now</span></div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+<li style="display: flex; white-space: nowrap; overflow: hidden"><span style="width: 2ch; flex: none"></span><span style="width: 5ch; flex: none; color: #98c379">ok</span><span style="width: 10ch; flex: none">key</span><span style="color: #8b919c; min-width: 0; overflow: hidden; text-overflow: ellipsis">owl:4kd9s2mfq7wz1xrt</span></li>
+<li style="display: flex; white-space: nowrap; overflow: hidden"><span style="width: 2ch; flex: none"></span><span style="width: 5ch; flex: none; color: #98c379">ok</span><span style="width: 10ch; flex: none">config</span></li>
+<li style="display: flex; white-space: nowrap; overflow: hidden"><span style="width: 2ch; flex: none"></span><span style="width: 5ch; flex: none; color: #98c379">ok</span><span style="width: 10ch; flex: none">endpoints</span><span style="color: #8b919c; min-width: 0; overflow: hidden; text-overflow: ellipsis">none configured, peers reach the daemon over iroh</span></li>
+<li style="display: flex; white-space: nowrap; overflow: hidden"><span style="width: 2ch; flex: none"></span><span style="width: 5ch; flex: none; color: #98c379">ok</span><span style="width: 10ch; flex: none">mcp</span><span style="color: #8b919c; min-width: 0; overflow: hidden; text-overflow: ellipsis">registered in Claude Code</span></li>
+<li style="display: flex; white-space: nowrap; overflow: hidden"><span style="width: 2ch; flex: none"></span><span style="width: 5ch; flex: none; color: #98c379">ok</span><span style="width: 10ch; flex: none">daemon</span><span style="color: #8b919c; min-width: 0; overflow: hidden; text-overflow: ellipsis">reachable</span></li>
+</ul>
+</section>
+<section style="display: flex; flex-direction: column">
+<h2 style="margin: 0; font: inherit; font-weight: 700; color: #8b919c">Version</h2>
+<div style="display: flex"><span style="width: 2ch; flex: none"></span><span style="width: 24ch; flex: none">owlpost</span><span>0.3.0</span></div>
+<div style="display: flex"><span style="width: 26ch; flex: none"></span><button><span style="color: #d97757">u:</span> Update</button></div>
+</section>
+</main>
+<div style="height: 20px; color: #8b919c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">✓ scan: claude, codex, opencode on PATH · fake not found</div>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<div style="color: #8b919c; display: flex; flex-wrap: wrap; column-gap: 2ch"><span style="color: #8b919c; font-weight: 700">keys</span><span><span style="color: #dfe1e5">tab</span> move</span><span><span style="color: #dfe1e5">↑↓</span> scroll</span><span><span style="color: #dfe1e5">enter</span> use for drafts</span><span><span style="color: #dfe1e5">e</span> edit</span><span><span style="color: #dfe1e5">s</span> scan</span><span><span style="color: #dfe1e5">a</span> add</span><span><span style="color: #dfe1e5">d</span> doctor</span><span><span style="color: #dfe1e5">u</span> update</span></div>
+</div>
+</body>
+</html>

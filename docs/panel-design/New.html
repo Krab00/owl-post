@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>owlpost — New message</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:#ffffff}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+input{outline:none}input::placeholder{color:#8b919c}
+textarea{outline:none}textarea::placeholder{color:#8b919c}
+a:focus-visible,button:focus-visible{outline:1px solid #d97757}
+</style>
+</head>
+<body>
+<div style="width: 580px; height: 880px; box-sizing: border-box; padding: 20px 2ch; background: #1f2229; color: #dfe1e5; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; line-height: 20px; display: flex; flex-direction: column; overflow: hidden">
+<nav aria-label="owlpost tabs" style="display: flex; flex-wrap: wrap; column-gap: 2ch; align-items: center">
+<a href="Main.html" style="color: #8b919c"><span style="color: #d97757">1:</span> Chats <span style="background: #d97757; color: #1f2229; font-weight: 700; padding: 0 1ch">3</span></a>
+<a href="Contacts.html" style="color: #8b919c"><span style="color: #d97757">2:</span> Contacts</a>
+<a href="New.html" aria-current="page" style="background: #d97757; color: #1f2229; font-weight: 700; padding: 0 1ch">New</a>
+<a href="Card.html" style="color: #8b919c"><span style="color: #d97757">4:</span> Card</a>
+<a href="Settings.html" style="color: #8b919c"><span style="color: #d97757">5:</span> Settings</a>
+<span style="flex: 1"></span>
+<button aria-label="Close panel" style="color: #8b919c"><span style="color: #d97757">q:</span> ×</button>
+</nav>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<main style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 20px">
+<div style="font-weight: 700">New message</div>
+<div style="display: flex; flex-direction: column">
+<div style="color: #8b919c">Kind</div>
+<div style="display: flex; flex-wrap: wrap; column-gap: 2ch">
+<button aria-pressed="true" style="background: #dfe1e5; color: #1f2229; padding: 0 1ch">Ask a question</button>
+<button aria-pressed="false" style="color: #8b919c">Request a file</button>
+<button aria-pressed="false" style="color: #8b919c">Call a tool</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column">
+<div style="color: #8b919c">To</div>
+<div style="display: flex; column-gap: 2ch">
+<span style="flex: 1; min-width: 0; font-weight: 700">Alex Carter</span>
+<button>[ Change ]</button>
+</div>
+<div style="color: #8b919c">owl:w3fh6kq2zr5tnb7y · policy manual</div>
+</div>
+<div style="display: flex; flex-direction: column">
+<div style="display: flex; column-gap: 2ch; color: #8b919c; white-space: nowrap">
+<span style="flex: none">Thread</span>
+<span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis">continuing lets their agent see the earlier messages</span>
+</div>
+<button aria-pressed="true" style="display: flex; width: 100%; column-gap: 1ch; white-space: nowrap">
+<span style="flex: none">(•) New thread</span>
+<span style="flex: 1; min-width: 0; color: #8b919c; overflow: hidden; text-overflow: ellipsis">starts a separate conversation</span>
+</button>
+<button aria-pressed="false" style="display: flex; width: 100%; column-gap: 1ch; color: #8b919c; white-space: nowrap">
+<span style="flex: none">( ) Continue ·</span>
+<span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis">What is the last commit on your side?</span>
+<span style="flex: none">today 07:15</span>
+</button>
+<button aria-pressed="false" style="display: flex; width: 100%; column-gap: 1ch; color: #8b919c; white-space: nowrap">
+<span style="flex: none">( ) Continue ·</span>
+<span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis">What time do you start tomorrow?</span>
+<span style="flex: none">today 00:20</span>
+</button>
+</div>
+<div style="display: flex; flex-direction: column">
+<label for="new-path" style="color: #8b919c">Path (optional)</label>
+<input id="new-path" type="text" placeholder="src/lib.rs" style="font: inherit; color: #dfe1e5; background: transparent; border: 1px solid #3a3f4b; height: 40px; padding: 0 1ch; box-sizing: border-box; width: 100%">
+</div>
+<div style="display: flex; flex-direction: column">
+<div style="color: #8b919c">Context (optional)</div>
+<div style="display: flex; flex-wrap: wrap; column-gap: 2ch">
+<button><span style="color: #d97757">f:</span> Attach a file (diff, error, excerpt · ≤ 8 KiB)</button>
+<button><span style="color: #d97757">u:</span> Use the text in the prompt box</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column">
+<label for="new-question" style="color: #8b919c">Question</label>
+<textarea id="new-question" placeholder="what do you want to ask?" style="font: inherit; color: #dfe1e5; background: transparent; border: 1px solid #d97757; height: 80px; padding: 9px 1ch; box-sizing: border-box; width: 100%; resize: none; display: block">Which branch is feature/x on now?</textarea>
+</div>
+<div style="display: flex; flex-wrap: wrap; column-gap: 2ch">
+<button style="color: #d97757; font-weight: 700">[ Send ]</button>
+<span style="color: #8b919c">enter sends — the command is the approval</span>
+</div>
+</main>
+<div style="height: 20px; color: #8b919c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"></div>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<div style="color: #8b919c; display: flex; flex-wrap: wrap; column-gap: 2ch">
+<span style="color: #8b919c; font-weight: 700">keys</span>
+<span style="color: #e5c07b">typing</span>
+<span><span style="color: #dfe1e5">enter</span> send</span>
+<span><span style="color: #dfe1e5">tab</span> leave the field</span>
+<span>then</span>
+<span><span style="color: #dfe1e5">u</span> use prompt text</span>
+<span><span style="color: #dfe1e5">f</span> attach</span>
+<span><span style="color: #dfe1e5">esc</span> prompt</span>
+</div>
+</div>
+</body>
+</html>

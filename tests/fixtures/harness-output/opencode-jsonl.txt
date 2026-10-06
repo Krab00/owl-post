@@ -1,0 +1,4 @@
+{"type":"step_start","timestamp":1756800000001,"sessionID":"ses_01","part":{"id":"prt_01","sessionID":"ses_01","messageID":"msg_01","type":"step-start"}}
+{"type":"tool_use","timestamp":1756800000200,"sessionID":"ses_01","part":{"id":"prt_02","sessionID":"ses_01","messageID":"msg_01","type":"tool","tool":"grep","state":{"status":"completed","input":{"pattern":"retry"},"output":"src/client.rs:42"}}}
+{"type":"text","timestamp":1756800000400,"sessionID":"ses_01","part":{"id":"prt_03","sessionID":"ses_01","messageID":"msg_01","type":"text","text":"The retry policy is in src/client.rs (retry_policy, commit 0123abc): three attempts with exponential backoff."}}
+{"type":"step_finish","timestamp":1756800000500,"sessionID":"ses_01","part":{"id":"prt_04","sessionID":"ses_01","messageID":"msg_01","type":"step-finish","reason":"stop","cost":0.002,"tokens":{"input":900,"output":40}}}

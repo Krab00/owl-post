@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>owlpost — Incoming request</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:#ffffff}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+input{outline:none}input::placeholder{color:#8b919c}
+textarea{outline:none}textarea::placeholder{color:#8b919c}
+a:focus-visible,button:focus-visible{outline:1px solid #d97757}
+</style>
+</head>
+<body>
+<div style="width: 580px; height: 880px; box-sizing: border-box; padding: 20px 2ch; background: #1f2229; color: #dfe1e5; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; line-height: 20px; display: flex; flex-direction: column; overflow: hidden">
+<nav aria-label="owlpost tabs" style="display: flex; flex-wrap: wrap; column-gap: 2ch; align-items: center">
+<a href="Main.html" aria-current="page" style="background: #d97757; color: #1f2229; font-weight: 700; padding: 0 1ch">Chats 3</a>
+<a href="Contacts.html" style="color: #8b919c"><span style="color: #d97757">2:</span> Contacts</a>
+<a href="New.html" style="color: #8b919c"><span style="color: #d97757">3:</span> New</a>
+<a href="Card.html" style="color: #8b919c"><span style="color: #d97757">4:</span> Card</a>
+<a href="Settings.html" style="color: #8b919c"><span style="color: #d97757">5:</span> Settings</a>
+<span style="flex: 1"></span>
+<button aria-label="Close panel" style="color: #8b919c"><span style="color: #d97757">q:</span> ×</button>
+</nav>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<main style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; column-gap: 2ch; align-items: center; white-space: nowrap">
+<a href="Contact.html" style="flex-shrink: 0"><span style="color: #d97757">b:</span> Back</a>
+<div style="flex: 1; min-width: 0; display: flex; column-gap: 1ch">
+<span style="color: #8b919c; flex-shrink: 0">Alex Carter ›</span>
+<span style="font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis">Do you have any decisions about communication in memory?</span>
+</div>
+<span style="color: #8b919c; flex-shrink: 0">m4e8b1</span>
+</div>
+
+<div style="color: #8b919c; text-align: center">── Sun 4 Oct ──</div>
+
+<div style="display: flex; flex-direction: column; align-items: flex-start">
+<div style="align-self: stretch; display: flex; column-gap: 2ch; justify-content: space-between; white-space: nowrap">
+<span style="color: #8b919c">14:14 · question · asks for a memory entry</span>
+<span style="color: #e5c07b">● needs your answer</span>
+</div>
+<div style="align-self: flex-start; max-width: 52ch; background: #2a2e37; padding: 0 1ch">Do you have any decisions about communication in memory?</div>
+</div>
+
+
+
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="color: #8b919c">14:15 · allowed once by you</div>
+<div style="display: flex; flex-direction: column; align-items: flex-end">
+<div style="color: #8b919c; text-align: right">14:16 · draft · by claude · <span style="color: #e5c07b">not sent</span></div>
+<div style="align-self: flex-end; max-width: 52ch; background: #3b2b25; border: 1px dashed #d97757; margin: -1px 0; padding: 0 1ch">Yes, two: a human approves every outgoing message, and owlpost work goes through a subagent, not the main session.</div>
+<div style="display: flex; flex-wrap: wrap; column-gap: 2ch; justify-content: flex-end">
+<button style="color: #d97757; font-weight: 700"><span style="color: #d97757">s:</span> Send</button>
+<button><span style="color: #d97757">e:</span> Edit</button>
+<button style="color: #8b919c"><span style="color: #d97757">d:</span> Redraft</button>
+<button style="color: #8b919c"><span style="color: #d97757">x:</span> Reject</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column">
+<label for="own-answer-drafted" style="color: #8b919c">Own answer</label>
+<textarea id="own-answer-drafted" placeholder="type your own answer — enter replaces the draft" style="font: inherit; color: #dfe1e5; background: transparent; border: 1px solid #3a3f4b; height: 80px; padding: 9px 1ch; box-sizing: border-box; width: 100%; resize: none; display: block"></textarea>
+</div>
+</div>
+
+<div style="flex: 1"></div>
+
+</main>
+<div style="height: 20px; color: #8b919c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">nothing leaves this machine until you press s</div>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<div style="color: #8b919c; display: flex; flex-wrap: wrap; column-gap: 2ch">
+<span style="color: #8b919c; font-weight: 700">keys</span>
+<span><span style="color: #dfe1e5">tab</span> move</span>
+<span><span style="color: #dfe1e5">s</span> send</span>
+<span><span style="color: #dfe1e5">e</span> edit</span>
+<span><span style="color: #dfe1e5">d</span> draft</span>
+<span><span style="color: #dfe1e5">x</span> reject</span>
+<span><span style="color: #dfe1e5">o</span> allow once</span>
+<span><span style="color: #dfe1e5">w</span> allow always</span>
+<span><span style="color: #dfe1e5">c</span> cite</span>
+<span><span style="color: #dfe1e5">b</span> back</span>
+</div>
+</div>
+</body>
+</html>

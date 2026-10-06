@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Owlpost Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:40px;background:#14161a;color:#dfe1e5;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:14px;line-height:20px}
+h1{font-size:20px;margin:0 0 40px}
+h2{font-size:16px;margin:60px 0 20px}
+a{color:inherit}
+.row{display:flex;flex-wrap:wrap;gap:40px}
+.row a{display:block;margin-bottom:10px}
+iframe{border:0;display:block}
+</style>
+</head>
+<body>
+<h1>Owlpost Panel</h1>
+<div style="color:#8b919c;margin-top:-20px">
+<div>Source: a private design canvas (not linked here).</div>
+<div>Exported: 2026-10-04.</div>
+<div>This folder is a static copy: ten screens as plain HTML, each in its default state (the consent and pending states of the incoming request and the delete confirmation exist only on the canvas).</div>
+<div>The canvas is the source of truth; this copy does not update itself and has to be regenerated after the canvas changes.</div>
+</div>
+
+<h2>Conversations: chats → threads → messages</h2>
+<div class="row">
+<div><a href="Main.html">Chats</a><iframe src="Main.html" width="580" height="880" title="Chats"></iframe></div>
+<div><a href="Contact.html">Contact · threads</a><iframe src="Contact.html" width="580" height="880" title="Contact · threads"></iframe></div>
+<div><a href="Thread.html">Thread · reply, cite, apply</a><iframe src="Thread.html" width="580" height="880" title="Thread · reply, cite, apply"></iframe></div>
+<div><a href="ThreadRequest.html">Thread · incoming request</a><iframe src="ThreadRequest.html" width="580" height="880" title="Thread · incoming request"></iframe></div>
+<div><a href="New.html">New message</a><iframe src="New.html" width="580" height="880" title="New message"></iframe></div>
+</div>
+
+<h2>Contacts, card, settings, keys</h2>
+<div class="row">
+<div><a href="Contacts.html">Contacts</a><iframe src="Contacts.html" width="580" height="880" title="Contacts"></iframe></div>
+<div><a href="Card.html">Card</a><iframe src="Card.html" width="580" height="880" title="Card"></iframe></div>
+<div><a href="Settings.html">Settings</a><iframe src="Settings.html" width="580" height="880" title="Settings"></iframe></div>
+<div><a href="Keys.html">Keys (h)</a><iframe src="Keys.html" width="580" height="880" title="Keys (h)"></iframe></div>
+</div>
+
+<h2>Bridge to the main agent: Cite and Apply</h2>
+<div class="row">
+<div><a href="Bridge.html">Bridge · cite and apply in the main agent</a><iframe src="Bridge.html" width="1280" height="800" title="Bridge · cite and apply in the main agent"></iframe></div>
+</div>
+</body>
+</html>

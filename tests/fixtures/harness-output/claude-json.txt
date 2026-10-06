@@ -1,0 +1,1 @@
+{"type":"result","subtype":"success","is_error":false,"duration_ms":4213,"num_turns":3,"result":"The retry policy lives in src/client.rs: three attempts with exponential backoff (commit 0123abc).","session_id":"9c1d2e3f-0000-4000-8000-000000000000","total_cost_usd":0.0123,"usage":{"input_tokens":812,"output_tokens":64}}

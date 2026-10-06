@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>owlpost — Thread</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:#ffffff}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+input{outline:none}input::placeholder{color:#8b919c}
+textarea{outline:none}textarea::placeholder{color:#8b919c}
+a:focus-visible,button:focus-visible{outline:1px solid #d97757}
+</style>
+</head>
+<body>
+<div style="width: 580px; height: 880px; box-sizing: border-box; padding: 20px 2ch; background: #1f2229; color: #dfe1e5; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; line-height: 20px; display: flex; flex-direction: column; overflow: hidden">
+<nav aria-label="owlpost tabs" style="display: flex; flex-wrap: wrap; column-gap: 2ch; align-items: center">
+<a href="Main.html" aria-current="page" style="background: #d97757; color: #1f2229; font-weight: 700; padding: 0 1ch">Chats 3</a>
+<a href="Contacts.html" style="color: #8b919c"><span style="color: #d97757">2:</span> Contacts</a>
+<a href="New.html" style="color: #8b919c"><span style="color: #d97757">3:</span> New</a>
+<a href="Card.html" style="color: #8b919c"><span style="color: #d97757">4:</span> Card</a>
+<a href="Settings.html" style="color: #8b919c"><span style="color: #d97757">5:</span> Settings</a>
+<span style="flex: 1"></span>
+<button aria-label="Close panel" style="color: #8b919c"><span style="color: #d97757">q:</span> ×</button>
+</nav>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<main style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-direction: column">
+<div style="display: flex; column-gap: 2ch; align-items: center; white-space: nowrap">
+<a href="Contact.html" style="flex-shrink: 0"><span style="color: #d97757">b:</span> Back</a>
+<div style="flex: 1; min-width: 0; display: flex; column-gap: 1ch">
+<span style="color: #8b919c; flex-shrink: 0">Alex Carter ›</span>
+<span style="font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis">What is the last commit on your side?</span>
+</div>
+<span style="color: #8b919c; flex-shrink: 0">k3f9a2</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; column-gap: 2ch; align-items: center">
+<span style="color: #8b919c">to main agent</span>
+<button style="color: #8b919c"><span style="color: #d97757">t:</span> Cite thread</button>
+<button style="color: #8b919c"><span style="color: #d97757">u:</span> Apply thread</button>
+<span style="flex: 1"></span>
+<a href="New.html" style="color: #8b919c"><span style="color: #d97757">n:</span> New thread</a>
+</div>
+</div>
+
+<div style="color: #8b919c; text-align: center">── Sun 4 Oct ──</div>
+
+<div style="display: flex; flex-direction: column; align-items: flex-end">
+<div style="color: #8b919c; text-align: right">07:08 · you · <span style="color: #98c379">✓ answered</span></div>
+<div style="align-self: flex-end; max-width: 52ch; background: #3b2b25; padding: 0 1ch">What is the last commit on your side?</div>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: flex-start">
+<div style="color: #8b919c"><span style="color: #d97757">▸</span> 07:08 · answer · drafted by claude · approved by Alex</div>
+<div style="align-self: flex-start; max-width: 52ch; background: #2a2e37; padding: 0 1ch">Last commit on branch <span style="color: #d97757">main</span> in this checkout: <span style="color: #d97757">a1b2c3d</span> — "Merge pull request #12 from Krab00/feature/x"</div>
+<div style="display: flex; flex-wrap: wrap; column-gap: 2ch">
+<button><span style="color: #d97757">r:</span> Reply</button>
+<button style="color: #8b919c"><span style="color: #d97757">y:</span> Copy</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; column-gap: 2ch">
+<span style="color: #8b919c">to main agent</span>
+<button><span style="color: #d97757">c:</span> Cite</button>
+<button><span style="color: #d97757">a:</span> Apply</button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: flex-end">
+<div style="color: #8b919c; text-align: right">07:15 · you · <span style="color: #e5c07b">… waiting for consent</span></div>
+<div style="align-self: flex-end; max-width: 52ch; background: #3b2b25; padding: 0 1ch">And which branch is feature/x on now?</div>
+</div>
+
+<div style="flex: 1"></div>
+
+<div style="display: flex; flex-direction: column">
+<label for="thread-reply" style="color: #8b919c"><span style="color: #d97757">r:</span> Reply in this thread</label>
+<textarea id="thread-reply" placeholder="follow-up question — enter sends" style="font: inherit; color: #dfe1e5; background: transparent; border: 1px solid #3a3f4b; height: 80px; padding: 9px 1ch; box-sizing: border-box; width: 100%; resize: none; display: block"></textarea>
+<div style="display: flex; flex-wrap: wrap; column-gap: 2ch; align-items: center">
+<button style="color: #8b919c"><span style="color: #d97757">p:</span> Add path</button>
+<button style="color: #8b919c"><span style="color: #d97757">f:</span> Attach context (≤ 8 KiB)</button>
+<span style="flex: 1"></span>
+<button style="color: #d97757; font-weight: 700">[ Send ]</button>
+</div>
+</div>
+
+</main>
+<div style="height: 20px; color: #8b919c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"><span style="color: #98c379">✓</span> accepted q7c1d0 — waiting for the owner's consent</div>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<div style="color: #8b919c; display: flex; flex-wrap: wrap; column-gap: 2ch">
+<span style="color: #8b919c; font-weight: 700">keys</span>
+<span><span style="color: #dfe1e5">tab</span> move</span>
+<span><span style="color: #dfe1e5">↑↓</span> scroll</span>
+<span><span style="color: #dfe1e5">r</span> reply</span>
+<span><span style="color: #dfe1e5">y</span> copy</span>
+<span><span style="color: #dfe1e5">c</span> cite</span>
+<span><span style="color: #dfe1e5">a</span> apply</span>
+<span><span style="color: #dfe1e5">t</span> cite thread</span>
+<span><span style="color: #dfe1e5">u</span> apply thread</span>
+<span><span style="color: #dfe1e5">b</span> back</span>
+</div>
+</div>
+</body>
+</html>

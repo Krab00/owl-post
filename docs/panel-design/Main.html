@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>owlpost — Chats</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:#ffffff}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+input{outline:none}input::placeholder{color:#8b919c}
+a:focus-visible,button:focus-visible{outline:1px solid #d97757}
+</style>
+</head>
+<body>
+<div style="width: 580px; height: 880px; box-sizing: border-box; padding: 20px 2ch; background: #1f2229; color: #dfe1e5; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; line-height: 20px; display: flex; flex-direction: column; overflow: hidden">
+<nav aria-label="owlpost tabs" style="display: flex; flex-wrap: wrap; column-gap: 2ch; align-items: center">
+<a href="Main.html" aria-current="page" style="background: #d97757; color: #1f2229; font-weight: 700; padding: 0 1ch">Chats 3</a>
+<a href="Contacts.html" style="color: #8b919c"><span style="color: #d97757">2:</span> Contacts</a>
+<a href="New.html" style="color: #8b919c"><span style="color: #d97757">3:</span> New</a>
+<a href="Card.html" style="color: #8b919c"><span style="color: #d97757">4:</span> Card</a>
+<a href="Settings.html" style="color: #8b919c"><span style="color: #d97757">5:</span> Settings</a>
+<span style="flex: 1"></span>
+<button aria-label="Close panel" style="color: #8b919c"><span style="color: #d97757">q:</span> ×</button>
+</nav>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<main style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; column-gap: 2ch; align-items: center">
+<span style="font-weight: 700">Chats</span>
+<span style="color: #8b919c">3 unseen · 1 waiting for you</span>
+<span style="flex: 1"></span>
+<a href="New.html"><span style="color: #d97757">n:</span> New thread</a>
+</div>
+<div style="display: flex; flex-direction: column">
+<label for="chat-filter" style="color: #8b919c"><span style="color: #d97757">f:</span> Filter</label>
+<input id="chat-filter" type="text" placeholder="name, e-mail, fingerprint or text" style="font: inherit; color: #dfe1e5; background: transparent; border: 1px solid #3a3f4b; height: 40px; padding: 0 1ch; box-sizing: border-box; width: 100%">
+</div>
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; background: #2a2e37">
+<a href="Contact.html" style="display: flex; flex-direction: column">
+<span style="display: flex">
+<span style="width: 2ch; flex: none; color: #d97757">▸</span>
+<span style="flex: 1; min-width: 0; display: flex; column-gap: 1ch; white-space: nowrap; overflow: hidden">
+<span style="flex: 0 1 auto; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis">Alex Carter</span>
+<span style="flex: none; color: #98c379">●</span>
+</span>
+<span style="flex: none; color: #8b919c; padding: 0 1ch">14:14</span>
+</span>
+<span style="display: flex; column-gap: 1ch">
+<span style="width: 1ch; flex: none"></span>
+<span style="flex: none; color: #e5c07b">●</span>
+<span style="flex: none; color: #e5c07b">needs your answer</span>
+<span style="flex: 1; min-width: 0; color: #8b919c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Do you have any decisions about communication in memory?</span>
+<span style="flex: none; background: #d97757; color: #1f2229; font-weight: 700; padding: 0 1ch; margin-right: 1ch">1</span>
+</span>
+</a>
+<div style="display: flex; flex-wrap: wrap; column-gap: 3ch; padding-left: 2ch">
+<a href="Contact.html"><span style="color: #d97757">enter:</span> Open</a>
+<button><span style="color: #d97757">a:</span> Archive</button>
+<button style="color: #e06c75"><span style="color: #d97757">x:</span> Delete</button>
+</div>
+</div>
+<a href="Contact.html" style="display: flex; flex-direction: column">
+<span style="display: flex">
+<span style="width: 2ch; flex: none"></span>
+<span style="flex: 1; min-width: 0; display: flex; column-gap: 1ch; white-space: nowrap; overflow: hidden">
+<span style="flex: 0 1 auto; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis">Mia Novak</span>
+<span style="flex: none; color: #98c379">●</span>
+</span>
+<span style="flex: none; color: #8b919c; padding: 0 1ch">yesterday</span>
+</span>
+<span style="display: flex; column-gap: 1ch">
+<span style="width: 1ch; flex: none"></span>
+<span style="flex: none; color: #98c379">✓</span>
+<span style="flex: 1; min-width: 0; color: #8b919c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">We run migrations from deploy/migrate.sh, always after the build.</span>
+<span style="flex: none; background: #d97757; color: #1f2229; font-weight: 700; padding: 0 1ch; margin-right: 1ch">2</span>
+</span>
+</a>
+<a href="Contact.html" style="display: flex; flex-direction: column">
+<span style="display: flex">
+<span style="width: 2ch; flex: none"></span>
+<span style="flex: 1; min-width: 0; display: flex; column-gap: 1ch; white-space: nowrap; overflow: hidden">
+<span style="flex: 0 1 auto; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis">Sam Reed</span>
+<span style="flex: none; color: #8b919c">○</span>
+</span>
+<span style="flex: none; color: #8b919c; padding: 0 1ch">Fri</span>
+</span>
+<span style="display: flex; column-gap: 1ch">
+<span style="width: 1ch; flex: none"></span>
+<span style="flex: none; color: #e5c07b">…</span>
+<span style="flex: 1; min-width: 0; color: #8b919c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">waiting for consent · Which branch do you deploy from?</span>
+</span>
+</a>
+<a href="Contact.html" style="display: flex; flex-direction: column">
+<span style="display: flex">
+<span style="width: 2ch; flex: none"></span>
+<span style="flex: 1; min-width: 0; display: flex; column-gap: 1ch; white-space: nowrap; overflow: hidden">
+<span style="flex: 0 1 auto; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis">mac-mini CI</span>
+<span style="flex: none; color: #8b919c">○</span>
+</span>
+<span style="flex: none; color: #8b919c; padding: 0 1ch">28 Sep</span>
+</span>
+<span style="display: flex; column-gap: 1ch">
+<span style="width: 1ch; flex: none"></span>
+<span style="flex: none; color: #8b919c">×</span>
+<span style="flex: 1; min-width: 0; color: #8b919c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">policy never · 1 ask denied</span>
+</span>
+</a>
+<div style="display: flex; column-gap: 1ch; padding-left: 2ch">
+<button style="color: #8b919c"><span style="color: #d97757">v:</span> Show archived</button>
+<span style="color: #8b919c">0</span>
+</div>
+</div>
+</main>
+<div style="height: 20px; color: #8b919c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">last pull 19s ago</div>
+<div style="height: 9px; border-bottom: 1px solid #3a3f4b; margin-bottom: 10px"></div>
+<div style="color: #8b919c; display: flex; flex-wrap: wrap; column-gap: 2ch">
+<span style="color: #8b919c; font-weight: 700">keys</span>
+<span><span style="color: #dfe1e5">tab</span> move</span>
+<span><span style="color: #dfe1e5">↑↓</span> scroll</span>
+<span><span style="color: #dfe1e5">enter</span> open</span>
+<span><span style="color: #dfe1e5">a</span> archive</span>
+<span><span style="color: #dfe1e5">x</span> delete</span>
+<span><span style="color: #dfe1e5">f</span> filter</span>
+<span><span style="color: #dfe1e5">n</span> new thread</span>
+<span><span style="color: #dfe1e5">h</span> keys</span>
+</div>
+</div>
+</body>
+</html>

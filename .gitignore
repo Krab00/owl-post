@@ -1,0 +1,8 @@
+/target
+/.worktrees
+*.log
+.DS_Store
+/.orch/
+/dist/
+/plugins/claude-code/.claude-plugin/types/
+/.claude/
