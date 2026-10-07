@@ -101,12 +101,36 @@ pub fn project_dir(config: &Config, project: &str) -> anyhow::Result<PathBuf> {
 }
 
 /// Where a plain question about a project this machine does not map runs: an empty
-/// directory under the owlpost home, never a checkout (nor the home itself, which holds the
-/// key).
+/// directory outside the owlpost home (which holds the key, and a read-only harness can read
+/// `..`), never a checkout. Refused when it would still land inside the home.
 pub fn no_project_dir(home: &Path) -> anyhow::Result<PathBuf> {
-    let dir = home.join("no-project");
+    let dir = no_project_path(std::env::var_os("XDG_CACHE_HOME"), std::env::var_os("HOME"));
     std::fs::create_dir_all(&dir).with_context(|| format!("creating {}", dir.display()))?;
+    let dir = std::fs::canonicalize(&dir)?;
+    if let Ok(home) = std::fs::canonicalize(home)
+        && dir.starts_with(&home)
+    {
+        bail!(
+            "{} is inside the owlpost home {}",
+            dir.display(),
+            home.display()
+        );
+    }
     Ok(dir)
+}
+
+/// `$XDG_CACHE_HOME/owlpost/no-project`, else `$HOME/.cache/owlpost/no-project`.
+// ponytail: HOME only — no `dirs` crate, like `config::home_dir`.
+pub fn no_project_path(
+    xdg_cache: Option<std::ffi::OsString>,
+    home_env: Option<std::ffi::OsString>,
+) -> PathBuf {
+    xdg_cache
+        .filter(|v| !v.is_empty())
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from(home_env.unwrap_or_default()).join(".cache"))
+        .join("owlpost")
+        .join("no-project")
 }
 
 pub fn notes_dir(home: &Path, project: &str) -> PathBuf {
@@ -973,8 +997,8 @@ mod tests {
         assert_eq!(select_harness(&cfg, None).unwrap().0, "kimi");
     }
 
-    /// A plain question about an unmapped project runs the harness in `<home>/no-project`,
-    /// not a checkout; with a path it is still `unknown project`.
+    /// A plain question about an unmapped project runs the harness in the neutral directory
+    /// outside the owlpost home, not a checkout; with a path it is still `unknown project`.
     #[test]
     fn unconfigured_project_runs_in_the_neutral_dir() {
         let home = tempfile::tempdir().unwrap();
@@ -985,10 +1009,10 @@ mod tests {
         fake.answer_path = "raw".into();
         cfg.responder.harness = "fake".into();
         let d = draft(&cfg, home.path(), None, "github.com/else/where", None, "q").unwrap();
-        assert_eq!(
-            Path::new(&d.text).canonicalize().unwrap(),
-            home.path().join("no-project").canonicalize().unwrap(),
-        );
+        let ran_in = Path::new(&d.text).canonicalize().unwrap();
+        assert_eq!(ran_in, no_project_dir(home.path()).unwrap());
+        assert!(ran_in.ends_with("owlpost/no-project"), "{ran_in:?}");
+        assert!(!ran_in.starts_with(home.path().canonicalize().unwrap()));
         let e = draft(
             &cfg,
             home.path(),
@@ -1000,6 +1024,31 @@ mod tests {
         .unwrap_err()
         .to_string();
         assert!(e.contains("unknown project"), "{e}");
+    }
+
+    #[test]
+    fn no_project_path_prefers_xdg_cache_then_home_cache() {
+        assert_eq!(
+            no_project_path(Some("/x".into()), Some("/h".into())),
+            PathBuf::from("/x/owlpost/no-project")
+        );
+        assert_eq!(
+            no_project_path(Some("".into()), Some("/h".into())),
+            PathBuf::from("/h/.cache/owlpost/no-project")
+        );
+        assert_eq!(
+            no_project_path(None, Some("/h".into())),
+            PathBuf::from("/h/.cache/owlpost/no-project")
+        );
+    }
+
+    /// The neutral directory is refused when it would sit inside the owlpost home.
+    #[test]
+    fn no_project_dir_is_never_inside_the_home() {
+        let cache = no_project_path(std::env::var_os("XDG_CACHE_HOME"), std::env::var_os("HOME"));
+        let home = cache.parent().unwrap().parent().unwrap();
+        let e = no_project_dir(home).unwrap_err().to_string();
+        assert!(e.contains("inside the owlpost home"), "{e}");
     }
 
     #[test]
