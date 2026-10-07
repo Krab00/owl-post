@@ -1,65 +1,36 @@
 # CLAUDE.md
 
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+owlpost (`owl`): a CLI + local daemon that lets one developer's coding agent ask another's
+agent about their code, peer to peer, with the owner's consent on every answer. Rust binary in
+`src/`, Claude Code plugin (panel, commands, skill) in `plugins/claude-code/`. Design docs in
+`docs/` (`concept.md` → `architecture.md` → `technical-design.md` → `guide.md`).
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+## Commands
 
-## 1. Think Before Coding
-
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
-
-Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
-
-## 2. Simplicity First
-
-**Minimum code that solves the problem. Nothing speculative.**
-
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
-
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
-
-## 3. Surgical Changes
-
-**Touch only what you must. Clean up only your own mess.**
-
-When editing existing code:
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
-
-When your changes create orphans:
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
-
-The test: Every changed line should trace directly to the user's request.
-
-## 4. Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
-
-Transform tasks into verifiable goals:
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
-
-For multi-step tasks, state a brief plan:
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
+```sh
+cargo build
+cargo test --workspace
+cargo clippy --all-targets -- -D warnings
+cargo fmt --check
+claude plugin test plugins/claude-code      # panel + command tests
 ```
 
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+CI runs exactly these four cargo commands. Run one cargo build at a time.
 
----
+## Rules
 
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+- Every change goes through a branch and a PR. Never commit to `main`.
+- Never add private or sensitive data to the repo: no e-mails, real names, fingerprints,
+  public or private keys, tokens, home paths (`/Users/...`, `/home/...`), chat or inbox
+  content, not in code, tests, fixtures, docs, PR text or commit messages. Use placeholders
+  (`alice@example.com`, `/code/app`). `scripts/check-private.sh` refuses such content: it runs
+  as the pre-commit hook (`git config core.hooksPath scripts/githooks`, once per clone) and in
+  CI. Do not bypass it with `--no-verify`.
+- Minimal diffs in the existing style. No speculative abstractions or configurability.
+- Non-trivial logic ships with a test. Fixtures must not touch the real home (`OWLPOST_HOME`,
+  `XDG_CACHE_HOME` point at a tempdir in tests).
+- Security boundaries stay: a peer's request never reads a file or runs anything before the
+  owner's consent, a harness never gets a cwd inside the owlpost home, every input from a
+  peer is validated at the daemon before it reaches the inbox.
+- Panel code follows the approved mock 1:1; CLI output wording is part of the contract
+  (the plugin and tests match it verbatim).
