@@ -2,8 +2,10 @@ name: release
 
 # Builds `owl` for the four supported targets, packs each as owl-<version>-<target>.tar.gz,
 # writes SHA256SUMS over the four tarballs and, on a `v*` tag, attaches everything to a GitHub
-# release. `workflow_dispatch` on any branch is the dry run: same build, same artifacts
-# uploaded to the workflow run, no release created (design §11).
+# release. A push to `main` releases `v<Cargo.toml version>` the same way unless that release or
+# tag already exists (then nothing is built); `gh release create` creates the tag itself, so no
+# second workflow run is needed. `workflow_dispatch` on any branch is the dry run: same build,
+# same artifacts uploaded to the workflow run, no release created (design §11).
 #
 # Linux aarch64 is cross-compiled with cargo-zigbuild (zig as the C compiler and linker, no
 # Docker, glibc floor 2.17) so both Linux targets build on one ubuntu runner; both macOS targets
@@ -11,6 +13,7 @@ name: release
 
 on:
   push:
+    branches: [main]
     tags: ["v*"]
   workflow_dispatch:
     inputs:
@@ -32,15 +35,27 @@ jobs:
       tag: ${{ steps.v.outputs.tag }}
       version: ${{ steps.v.outputs.version }}
       publish: ${{ steps.v.outputs.publish }}
+      skip: ${{ steps.v.outputs.skip }}
     steps:
       - uses: actions/checkout@v4
       - id: v
         env:
           INPUT_TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -eu
           cargo_ver=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n 1)
-          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+          skip=false
+          if [ "$GITHUB_EVENT_NAME" = "push" ] && [ "$GITHUB_REF_TYPE" = "branch" ]; then
+            tag="v${cargo_ver}"
+            version="$cargo_ver"
+            publish=true
+            if gh release view "$tag" >/dev/null 2>&1 \
+              || git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+              echo "::notice::release $tag already exists; bump version in Cargo.toml to publish"
+              skip=true
+            fi
+          elif [ "$GITHUB_EVENT_NAME" = "push" ]; then
             tag="$GITHUB_REF_NAME"
             version="${tag#v}"
             if [ "$version" != "$cargo_ver" ]; then
@@ -56,10 +71,12 @@ jobs:
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "publish=$publish" >> "$GITHUB_OUTPUT"
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"
           echo "packaging owl $version as $tag (publish=$publish)"
 
   build:
     needs: meta
+    if: needs.meta.outputs.skip != 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -132,13 +149,14 @@ jobs:
           name: SHA256SUMS
           path: dist/SHA256SUMS
           if-no-files-found: error
+      # On a tag push the tag exists already; on a main push this creates it at the built commit.
       - name: Create GitHub release
         if: needs.meta.outputs.publish == 'true'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.meta.outputs.tag }}
-          name: owl ${{ needs.meta.outputs.version }}
-          files: |
-            dist/owl-*.tar.gz
-            dist/SHA256SUMS
-          fail_on_unmatched_files: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.meta.outputs.tag }}
+        run: |
+          set -eu
+          gh release create "$TAG" dist/owl-*.tar.gz dist/SHA256SUMS \
+            --target "$GITHUB_SHA" --title "owl $VERSION" --generate-notes

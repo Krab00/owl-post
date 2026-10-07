@@ -20,6 +20,8 @@ CI runs exactly these four cargo commands. Run one cargo build at a time.
 ## Rules
 
 - Every change goes through a branch and a PR. Never commit to `main`.
+- A change users should receive bumps `version` in `Cargo.toml`; merging to `main` with a new
+  version publishes the release (`owl update` picks it up).
 - Never add private or sensitive data to the repo: no e-mails, real names, fingerprints,
   public or private keys, tokens, home paths (`/Users/...`, `/home/...`), chat or inbox
   content, not in code, tests, fixtures, docs, PR text or commit messages. Use placeholders

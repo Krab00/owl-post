@@ -1,6 +1,6 @@
 [package]
 name = "owlpost"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "Ask a colleague's local coding agent about their code, peer to peer"
 license = "GPL-3.0-or-later"
