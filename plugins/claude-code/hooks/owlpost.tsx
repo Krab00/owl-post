@@ -501,6 +501,11 @@ export const register: Register = (on) => {
     await (s.paneOpen ? closePane($) : open($, { name: 'chats' }))
     return {}
   })
+  // `/owlpost:stop` closes the pane, then runs as a plain command (watch off, `owl stop`).
+  on('command.run', { command: 'owlpost:stop' }, async ($, e, next) => {
+    if (s.paneOpen) await closePane($)
+    return next(e)
+  })
   on('command.run', { command: 'owlpost:contacts' }, async ($) => {
     await toggle($, { name: 'contacts' })
     return {}

@@ -320,6 +320,15 @@ draft on the record. You should see the draft text, then `harness: ...`, `redact
 `state: drafted (<id>)`. `--harness <name>` picks another configured harness. Exit 1 means the
 draft was stored but needs a look (timeout or extraction failure).
 
+The checkout comes from the `projects` table of `config.json`: the key is the project the
+asker's `owl ask` detected (the origin remote as `host/org/repo`, else the directory name),
+the value the local path. `owl project add [path] [--name <key>]` maps a checkout (default:
+the current directory, key detected the same way), `owl project list` shows the table
+(`missing` marks a checkout that is gone) and `owl project remove <name>` drops a key; the
+running daemon picks the change up without a restart. A plain question about a project that
+is not in the table is still accepted and answered outside any checkout; a question about a
+file, a file request or a tool call needs the project mapped.
+
 `/owlpost:draft <id>` answers in the session instead: `owl draft <id> --prompt` prints the
 responder prompt, the plugin hands it to the Agent tool (a read-only subagent on a cheaper
 model), and `owl draft <id> --agent --text <reply>` stores the answer, redacted, as
@@ -552,6 +561,11 @@ owl uninstall
 
 Stops and removes the daemon service; questions and answers stop flowing until you run
 `owl install` again. You should see `stopped <service>` and `removed <path>`.
+
+To pause without uninstalling, `owl stop` stops the service and keeps its unit (you should
+see `stopped owl daemon`) and `owl start` starts it again (`started owl daemon`); the next
+login starts it too. `/owlpost:stop` also closes the panel and switches the live watch off,
+`/owlpost:start` switches it back on.
 
 ### 5.3 Harnesses
 

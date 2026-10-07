@@ -3,7 +3,7 @@
 // and every key the panel binds. `owl` is the world of tests/world.ts.
 import { expect, test } from 'claude-code/testing'
 import type { Engine } from 'claude-code/testing'
-import type { Check, Harness } from '../hooks/lib'
+import type { Check, Harness, Project } from '../hooks/lib'
 import { P, SIGN } from '../hooks/ui'
 import { HOME, SURFACES, activeTab, calls, current, field, footer, pane, panel, press, texts, type, world, type Answer, type Surface } from './world'
 
@@ -343,7 +343,7 @@ test('the footer shows the settings hints and the default note', async ($, on) =
   await panel($)
   await press($, 'tab-settings')
   const f = await footer($)
-  expect(f.hints).toBe('keystab move↑↓ scrollenter use for draftse edits scana addd doctoru update')
+  expect(f.hints).toBe('keystab move↑↓ scrollenter use for draftse edits scana addp project pathn project namer remove projectd doctoru update')
   expect(f.note).toBe('switches are stored in plugin.json of the owlpost home')
 })
 
@@ -964,4 +964,193 @@ test('a opens and closes the add block; what was typed in the edit field survive
   await press($, 'tab-settings')
   expect(await field($, 'harness-cmd-edit')).toBe('codex --typed')
   await ring($)
+})
+
+// ------------------------------------------------------------------ projects
+
+const pj = (name: string, path = `/code/${name}`, exists = true): Project => ({ name, path, exists })
+
+test('no projects: one line says none are registered and how to add one', async ($, on) => {
+  world(on)
+  await panel($)
+  await press($, 'tab-settings')
+  for (const surface of SURFACES) {
+    const t = await texts($, surface)
+    expect(t).toContain("No projects registered. Add one below: a path (empty = this session's directory), then Enter.")
+    expect(await el($, 'project-remove', surface)).toBeUndefined()
+    expect(await el($, 'project-path', surface)).toBeDefined()
+    expect(await el($, 'project-name', surface)).toBeDefined()
+  }
+})
+
+test('the project rows draw name → path, the first selected, a gone checkout marked missing', async ($, on) => {
+  world(on, { projects: [pj('github.com/acme/app'), pj('old', '/gone/old', false)] })
+  await panel($)
+  await press($, 'tab-settings')
+  for (const surface of SURFACES) {
+    const t = await texts($, surface)
+    expect(t).not.toContain("No projects registered. Add one below: a path (empty = this session's directory), then Enter.")
+    expect(t).toContain(' → /code/github.com/acme/app')
+    expect(t).toContain(' → /gone/old')
+    expect(t.filter((x) => x === `${SIGN.bad} missing`)).toHaveLength(1)
+    expect(t.indexOf(`${SIGN.bad} missing`)).toBeGreaterThan(t.indexOf(' → /gone/old'))
+    expect(t.filter((x) => x === SIGN.selected)).toHaveLength(1)
+    expect(await labelOf($, 'project-row-github.com/acme/app', surface)).toBe('github.com/acme/app')
+    expect(await labelOf($, 'project-remove', surface)).toBe('Remove github.com/acme/app')
+    const p = await pane($, surface)
+    expect((await p.find({ key: 'project-github.com/acme/app' }))?.props.backgroundColor).toBe(P.selected)
+    expect((await p.find({ key: 'project-old' }))?.props.backgroundColor).toBeUndefined()
+    await p.unmount()
+  }
+})
+
+test('Add runs owl project add with the path and the name, reloads the list and clears both fields', async ($, on) => {
+  let list: Project[] = []
+  const rec = world(on, {
+    answers: (args) => {
+      if (args === 'project add --name acme -- src/app') {
+        list = [pj('acme', '/w/src/app')]
+        return 'added acme → /w/src/app'
+      }
+      if (args === 'project list --json') return JSON.stringify(list)
+      return undefined
+    },
+  })
+  await panel($)
+  await press($, 'tab-settings')
+  for (const surface of SURFACES) {
+    await type($, 'project-path', '@src/app', 'change', surface) // typed as in the prompt box
+    await type($, 'project-name', 'acme', 'change', surface)
+    const from = rec.runs.length
+    await press($, 'project-add', surface)
+    expect(calls(rec, from)).toEqual(['project add --name acme -- src/app', 'project list --json'])
+    expect((await footer($, surface)).note).toBe('✓ added acme → /w/src/app')
+    expect(await field($, 'project-path', surface)).toBe('')
+    expect(await field($, 'project-name', surface)).toBe('')
+    expect(await texts($, surface)).toContain(' → /w/src/app')
+    list = []
+  }
+})
+
+test('Enter with both fields empty adds the session directory under the detected name', async ($, on) => {
+  const rec = world(on, { answers: { 'project add': 'added github.com/acme/app → /w' } })
+  await panel($)
+  await press($, 'tab-settings')
+  for (const surface of SURFACES) {
+    const from = rec.runs.length
+    await type($, 'project-path', '', 'submit', surface)
+    expect(calls(rec, from)).toEqual(['project add', 'project list --json'])
+    expect((await footer($, surface)).note).toBe('✓ added github.com/acme/app → /w')
+    // Enter in the name field adds too.
+    const again = rec.runs.length
+    await type($, 'project-name', '', 'submit', surface)
+    expect(calls(rec, again)).toEqual(['project add', 'project list --json'])
+  }
+})
+
+test('a failed add says what owl said and keeps both fields', async ($, on) => {
+  const rec = world(on, { answers: { 'project add --name x -- /nope': { exitCode: 1, stderr: 'owl: /nope is not a directory' } } })
+  await panel($)
+  await press($, 'tab-settings')
+  for (const surface of SURFACES) {
+    await type($, 'project-name', 'x', 'change', surface)
+    const from = rec.runs.length
+    await type($, 'project-path', '/nope', 'submit', surface)
+    expect(calls(rec, from)).toEqual(['project add --name x -- /nope', 'project list --json'])
+    expect((await footer($, surface)).note).toBe('✗ owl: /nope is not a directory')
+    expect(await field($, 'project-path', surface)).toBe('/nope')
+    expect(await field($, 'project-name', surface)).toBe('x')
+    // Clear for the next surface.
+    await type($, 'project-path', '', 'change', surface)
+    await type($, 'project-name', '', 'change', surface)
+  }
+})
+
+test('p takes the newest @path of the prompt box into the path field', async ($, on) => {
+  const rec = world(on, { prompt: 'map @"old dir" and @../other/ please' })
+  await panel($)
+  await press($, 'tab-settings')
+  for (const surface of SURFACES) {
+    expect(await hotkeyOf($, 'project-path-focus', surface)).toBe('p')
+    expect(await hotkeyOf($, 'project-name-focus', surface)).toBe('n')
+    const from = rec.runs.length
+    await press($, 'project-path-focus', surface)
+    expect(calls(rec, from)).toEqual([])
+    expect(await field($, 'project-path', surface)).toBe('../other/')
+    expect((await footer($, surface)).note).toBe('✓ path ../other/ from the prompt box')
+    await type($, 'project-path', '', 'change', surface)
+  }
+})
+
+test('r asks first; Confirm removes the selected project and the reloaded list no longer holds it', async ($, on) => {
+  let list = [pj('acme'), pj('beta')]
+  const rec = world(on, {
+    answers: (args) => {
+      if (args === 'project remove -- beta') {
+        list = list.filter((x) => x.name !== 'beta')
+        return 'removed beta'
+      }
+      if (args === 'project list --json') return JSON.stringify(list)
+      return undefined
+    },
+  })
+  await panel($)
+  await press($, 'tab-settings')
+  for (const surface of SURFACES) {
+    await ring($, 'project-row-beta')
+    expect(await hotkeyOf($, 'project-remove', surface)).toBe('r')
+    let from = rec.runs.length
+    await press($, 'project-remove', surface)
+    expect(calls(rec, from)).toEqual([])
+    expect(await texts($, surface)).toContain('Remove project beta?')
+    expect(await hotkeyOf($, 'project-remove-confirm', surface)).toBeUndefined()
+    await press($, 'project-remove-cancel', surface)
+    expect(calls(rec, from)).toEqual([])
+    expect(await texts($, surface)).not.toContain('Remove project beta?')
+    await press($, 'project-remove', surface)
+    from = rec.runs.length
+    await press($, 'project-remove-confirm', surface)
+    expect(calls(rec, from)).toEqual(['project remove -- beta', 'project list --json'])
+    expect((await footer($, surface)).note).toBe('✓ removed beta')
+    expect(await el($, 'project-row-beta', surface)).toBeUndefined()
+    expect(await el($, 'project-row-acme', surface)).toBeDefined()
+    list = [pj('acme'), pj('beta')]
+    await press($, 'tab-card', surface)
+    await press($, 'tab-settings', surface)
+  }
+  await ring($)
+})
+
+test('a refused remove says why and keeps the row; leaving the tab drops the question', async ($, on) => {
+  const rec = world(on, {
+    projects: [pj('acme')],
+    answers: { 'project remove -- acme': { exitCode: 1, stderr: 'owl: tool lint runs in acme — change its cwd first' } },
+  })
+  await panel($)
+  await press($, 'tab-settings')
+  for (const surface of SURFACES) {
+    await press($, 'project-remove', surface)
+    const from = rec.runs.length
+    await press($, 'project-remove-confirm', surface)
+    expect(calls(rec, from)).toEqual(['project remove -- acme', 'project list --json'])
+    expect((await footer($, surface)).note).toBe('✗ owl: tool lint runs in acme — change its cwd first')
+    expect(await el($, 'project-row-acme', surface)).toBeDefined()
+    await press($, 'project-remove', surface)
+    await press($, 'tab-card', surface)
+    await press($, 'tab-settings', surface)
+    expect(await texts($, surface)).not.toContain('Remove project acme?')
+  }
+})
+
+test('the hotkeys stay unique on the screen with projects and harnesses', async ($, on) => {
+  world(on, { harnesses: [hz({ name: 'claude' })], projects: [pj('acme')] })
+  await panel($)
+  await press($, 'tab-settings')
+  for (const surface of SURFACES) {
+    const p = await pane($, surface)
+    const hotkeys = (await p.findAll({ type: 'Button' })).map((b) => b.props.hotkey).filter(Boolean)
+    await p.unmount()
+    expect(new Set(hotkeys).size).toBe(hotkeys.length)
+    for (const k of ['p', 'n', 'r']) expect(hotkeys).toContain(k)
+  }
 })

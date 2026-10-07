@@ -427,3 +427,135 @@ fn service_manager_failure_is_reported() {
     assert!(!stdout.contains("removed"), "{stdout}");
     assert!(stderr.contains("failed"), "{stderr}");
 }
+
+/// `owl stop` / `owl start` drive the service manager and keep the unit file.
+#[test]
+fn stop_and_start_drive_the_service_manager_and_keep_the_unit() {
+    let home = tempfile::tempdir().unwrap();
+    let user_home = tempfile::tempdir().unwrap();
+    let scratch = tempfile::tempdir().unwrap();
+    let (bin, log) = fake_service_manager(scratch.path(), 0);
+    let unit = unit_path(user_home.path());
+    let out = owl(home.path(), user_home.path())
+        .env("OWLPOST_INSTALL_NO_LOAD", "1")
+        .arg("install")
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "install: {}", text(&out).1);
+
+    let out = with_fake_path(owl(home.path(), user_home.path()), &bin)
+        .arg("stop")
+        .output()
+        .unwrap();
+    let (stdout, stderr) = text(&out);
+    assert!(out.status.success(), "stop: {stderr}");
+    assert_eq!(stdout, "stopped owl daemon\n");
+    assert!(unit.is_file(), "stop keeps the unit");
+    let mut expected: Vec<String> = if cfg!(target_os = "macos") {
+        vec![
+            "launchctl print gui/501/dev.owlpost.owl".into(),
+            "launchctl bootout gui/501/dev.owlpost.owl".into(),
+        ]
+    } else {
+        vec!["systemctl --user stop owlpost.service".into()]
+    };
+    assert_eq!(calls(&log), expected);
+
+    let out = with_fake_path(owl(home.path(), user_home.path()), &bin)
+        .arg("start")
+        .output()
+        .unwrap();
+    let (stdout, stderr) = text(&out);
+    assert!(out.status.success(), "start: {stderr}");
+    assert_eq!(stdout, "started owl daemon\n");
+    assert!(unit.is_file());
+    expected.push(if cfg!(target_os = "macos") {
+        "launchctl kickstart gui/501/dev.owlpost.owl".into()
+    } else {
+        "systemctl --user enable --now owlpost.service".into()
+    });
+    assert_eq!(calls(&log), expected);
+}
+
+/// A failing manager: `stop` of a service launchd does not know is a no-op on macOS; `start`
+/// falls back to loading the unit and reports that failure.
+#[test]
+fn stop_and_start_with_a_failing_service_manager() {
+    let home = tempfile::tempdir().unwrap();
+    let user_home = tempfile::tempdir().unwrap();
+    let scratch = tempfile::tempdir().unwrap();
+    let (bin, log) = fake_service_manager(scratch.path(), 3);
+    let unit = unit_path(user_home.path());
+    let out = owl(home.path(), user_home.path())
+        .env("OWLPOST_INSTALL_NO_LOAD", "1")
+        .arg("install")
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "install: {}", text(&out).1);
+
+    let out = with_fake_path(owl(home.path(), user_home.path()), &bin)
+        .arg("stop")
+        .output()
+        .unwrap();
+    let (stdout, stderr) = text(&out);
+    if cfg!(target_os = "macos") {
+        assert!(out.status.success(), "{stderr}");
+        assert_eq!(stdout, "stopped owl daemon\n");
+        assert_eq!(calls(&log), ["launchctl print gui/501/dev.owlpost.owl"]);
+    } else {
+        assert_eq!(out.status.code(), Some(1), "{stdout}{stderr}");
+        assert!(
+            stderr.contains("systemctl --user stop owlpost.service failed"),
+            "{stderr}"
+        );
+    }
+
+    let out = with_fake_path(owl(home.path(), user_home.path()), &bin)
+        .arg("start")
+        .output()
+        .unwrap();
+    let (stdout, stderr) = text(&out);
+    assert_eq!(out.status.code(), Some(1), "{stdout}{stderr}");
+    assert!(!stdout.contains("started"), "{stdout}");
+    assert!(stderr.contains("failed"), "{stderr}");
+    assert!(unit.is_file());
+}
+
+/// No unit: `stop` says so and succeeds, `start` fails pointing at `owl install`; neither
+/// touches the service manager or writes anything.
+#[test]
+fn stop_and_start_without_a_service_installed() {
+    let home = tempfile::tempdir().unwrap();
+    let user_home = tempfile::tempdir().unwrap();
+    let scratch = tempfile::tempdir().unwrap();
+    let (bin, log) = fake_service_manager(scratch.path(), 0);
+    let unit = unit_path(user_home.path());
+
+    let out = with_fake_path(owl(home.path(), user_home.path()), &bin)
+        .arg("stop")
+        .output()
+        .unwrap();
+    let (stdout, stderr) = text(&out);
+    assert!(out.status.success(), "{stderr}");
+    assert_eq!(
+        stdout,
+        format!(
+            "no owl daemon service installed ({} is absent)\n",
+            unit.display()
+        )
+    );
+
+    let out = with_fake_path(owl(home.path(), user_home.path()), &bin)
+        .arg("start")
+        .output()
+        .unwrap();
+    let (stdout, stderr) = text(&out);
+    assert_eq!(out.status.code(), Some(1), "{stdout}{stderr}");
+    assert!(
+        stderr.contains("no owl daemon service installed"),
+        "{stderr}"
+    );
+    assert!(stderr.contains("run owl install"), "{stderr}");
+    assert!(calls(&log).is_empty(), "{:?}", calls(&log));
+    assert!(files_under(user_home.path()).is_empty());
+}

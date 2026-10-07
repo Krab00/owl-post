@@ -56,8 +56,11 @@ patterns of the next steps a file runs itself); `tests/plugin.rs` pins the rule.
 | `/owlpost:setup [--name] [--email] [--plugin-source] [--dry-run]` | `commands/setup.md` | `owl setup` — init, daemon, plugin in one go |
 | `/owlpost:install [--dry-run]` | `commands/install.md` | `owl install` — register the daemon service |
 | `/owlpost:uninstall` | `commands/uninstall.md` | `owl uninstall` — remove the service (confirms first) |
+| `/owlpost:stop` | `commands/stop.md` | stop owlpost without uninstalling: the mod closes the panel (with mods on), `{"watch": false}` in `plugin.json` as `/owlpost:watch off`, then `owl stop` — stops the daemon service and keeps its unit |
+| `/owlpost:start` | `commands/start.md` | the mirror of `/owlpost:stop`: `{"watch": true}` as `/owlpost:watch on`, then `owl start` |
 | `/owlpost:doctor` | `commands/doctor.md` | `owl doctor` — check the setup, offer the fix per failure |
 | `/owlpost:harness <list\|scan\|add\|edit\|remove\|use> ...` | `commands/harness.md` | `owl harness` — the harness table of config.json |
+| `/owlpost:project add [path] [--name <key>] \| list \| remove <name>` | `commands/project.md` | `owl project` — the projects table of config.json (which checkout answers for which project) |
 | `/owlpost:update [--source <dir>]` | `commands/update.md` | `owl update` — replaces the running binary in place, daemon, plugin |
 
 ## Mention a contact
@@ -114,7 +117,9 @@ result) and the key hints. Colours are Claude Code theme keys, so they follow yo
   policy (auto / manual / never) or is removed after a confirmation; `n` adds a peer file.
 - **New**: ask a question, request a file or call a tool, as a new thread or continuing one.
 - **Card**: your card, **Copy peer file** for a colleague, and a colleague's card by name.
-- **Settings**: Live watch and the band (stored in `plugin.json`), doctor, install and
+- **Settings**: Live watch and the band (stored in `plugin.json`), the projects (`owl project`:
+  `name → path` rows, add a checkout — `p` takes the prompt box's `@path`, empty is the session's
+  directory —, `r` removes the selected one after a confirm), doctor, install and
   uninstall the daemon (uninstall asks first and has no key), update.
 
 Short ids on screen are the last six hex characters of the full id. To close the pane, run

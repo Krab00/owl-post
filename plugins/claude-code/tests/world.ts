@@ -4,7 +4,7 @@
 import { mock } from 'claude-code/testing'
 import type { Engine } from 'claude-code/testing'
 import type { On } from 'claude-code'
-import type { Contact, Ev, Harness, Presence, Thread } from '../hooks/lib'
+import type { Contact, Ev, Harness, Presence, Project, Thread } from '../hooks/lib'
 
 export const HOME = '/scratch/owlpost'
 export const SURFACES = ['terminal', 'desktop'] as const
@@ -29,6 +29,7 @@ export type WorldOptions = {
   presence?: Presence // `owl presence --json`; absent: exit 4 as with no daemon status yet
   daemonAddr?: string // `daemon.addr` of the owl home; absent: no such file
   harnesses?: Harness[] // `owl harness list --json`
+  projects?: Project[] // `owl project list --json`
   // Any other argv, joined with spaces (`card --json`, `send <id>`); a function sees every
   // call first and answers it when it returns something (a promise: `owl` still runs until then).
   answers?: Record<string, Answer | string> | ((args: string) => Answer | string | undefined | Promise<Answer | string | undefined>)
@@ -68,6 +69,9 @@ const FLAGS: Record<string, string[]> = {
   'harness edit': [],
   'harness remove': [],
   'harness use': [],
+  'project add': ['--name'],
+  'project list': [],
+  'project remove': [],
   ping: [],
   presence: [],
   inbox: ['--count', '--new', '--all', '--format', '--follow', '--session', '--hook-event'],
@@ -85,7 +89,7 @@ const FLAGS: Record<string, string[]> = {
 // (`owl <command> --help`); more is refused, so a flag written after `--` is an error too.
 const ARGS: Record<string, number> = {
   show: 1, send: 1, reject: 1, draft: 1, allow: 1, deny: 1, thread: 1, card: 1, 'contact remove': 1, call: 2, request: 3,
-  archive: 1, unarchive: 1, delete: 1, ping: 1, 'harness remove': 1, 'harness use': 1,
+  archive: 1, unarchive: 1, delete: 1, ping: 1, 'harness remove': 1, 'harness use': 1, 'project add': 1, 'project remove': 1,
 }
 
 // What the real CLI refuses before any answer above is looked at, so a mocked success can never
@@ -95,7 +99,7 @@ const ARGS: Record<string, number> = {
 // `--i-verified-the-fingerprint` (src/cli/allow.rs, exit 1).
 function refused(argv: string[], contacts: Contact[]): Answer | undefined {
   if (argv.length === 1 && argv[0] === '--version') return undefined
-  const cmd = argv[0] === 'contact' || argv[0] === 'harness' ? `${argv[0]} ${argv[1]}` : argv[0]
+  const cmd = argv[0] === 'contact' || argv[0] === 'harness' || argv[0] === 'project' ? `${argv[0]} ${argv[1]}` : argv[0]
   const flags = FLAGS[cmd]
   if (!flags) return { exitCode: 2, stderr: `error: unrecognized subcommand '${cmd}'` }
   const end = argv.indexOf('--')
@@ -192,6 +196,7 @@ export function world(on: On, o: WorldOptions = {}) {
       else if (args === 'presence --json')
         a = o.presence ? JSON.stringify(o.presence) : { exitCode: 4, stderr: 'owl: no daemon status yet (daemon.status missing) — is the daemon running? see owl install' }
       else if (args === 'harness list --json') a = JSON.stringify(o.harnesses ?? [])
+      else if (args === 'project list --json') a = JSON.stringify(o.projects ?? [])
       else a = ''
     }
     const r = typeof a === 'string' ? { stdout: a } : a

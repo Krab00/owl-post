@@ -1,11 +1,13 @@
 // Settings tab (`5`): the two inbox switches (live watch, band above the prompt), the
 // harnesses that draft answers (`owl harness`: list, scan PATH, add, edit the command, remove
-// with `x` while the ring is on its row, pick the drafting one), the daemon service (install,
+// with `x` while the ring is on its row, pick the drafting one), the projects (`owl project`:
+// list, add a checkout, remove the selected one with `r` after a confirm), the daemon service (install,
 // uninstall with `x` otherwise — it asks first) with its last pull, `owl doctor` row by row,
 // and the version with an update. The switches live in plugin.json of the owlpost home
 // (`setSwitch`).
-import { enter, reachable, s, type Api, type Check, type Harness } from './lib'
-import { Chosen, INPUT_MAX, P, SIGN, ago, clean, clip, line, pulse, type Ctx, type View } from './ui'
+import { enter, reachable, s, type Api, type Check, type Harness, type Project } from './lib'
+import { Chosen, Field, INPUT_MAX, P, SIGN, ago, clean, clip, line, pulse, type Ctx, type View } from './ui'
+import { promptFile } from './chats'
 
 let checks: Check[] = []
 let ranAt = '' // when doctor last ran, '' before it did
@@ -18,6 +20,11 @@ let editCmd = '' // the edit field's text (kept over a failed save)
 let adding = false // the add block (name and command fields) shows
 let addName = ''
 let addCmd = ''
+let projects: Project[] = []
+let project = '' // the name of the selected project row
+let projectPath = ''
+let projectName = ''
+let removing = '' // the project the remove question is open for ('' = none)
 
 // `owl harness list --json`; a failure leaves the list empty.
 async function loadHarnesses(api: Api) {
@@ -93,13 +100,62 @@ async function addHarness(api: Api, v: string) {
   api.redraw()
 }
 
+// `owl project list --json`; a failure leaves the list empty.
+async function loadProjects(api: Api) {
+  projects = await api.json<Project[]>(['project', 'list'], [])
+}
+
+// The selected project row: the one the focus ring is on, else the one selected before, else
+// the first.
+function chosenProject(): Project | undefined {
+  const ringed = projects.find((x) => s.ring === `project-row-${x.name}`)
+  if (ringed) project = ringed.name
+  return projects.find((x) => x.name === project) ?? projects[0]
+}
+
+// `p`: the path field takes the prompt box's newest `@file` (a directory too) when there is
+// one, and the ring goes to the field either way.
+async function pickPath(api: Api) {
+  const file = await promptFile(api)
+  if (file) {
+    projectPath = file
+    api.say(`✓ path ${file} from the prompt box`)
+  }
+  api.focus('project-path')
+}
+
+// Enter in either field, or Add: `owl project add [<path>] [--name <name>]`, an empty path
+// being the session's directory (owl runs there). A failure keeps both fields; a success
+// clears them, each under a new key so the engine draws it afresh, empty.
+async function addProject(api: Api) {
+  const path = projectPath.trim().replace(/^@/, '')
+  const name = projectName.trim()
+  const ok = await api.act(['project', 'add', ...(name ? ['--name', name] : []), ...(path ? ['--', path] : [])])
+  await loadProjects(api)
+  if (ok) {
+    for (const [k, v] of [['project-path', projectPath], ['project-name', projectName]] as const) if (v) s.entered[k] = (s.entered[k] ?? 0) + 1
+    projectPath = projectName = ''
+  }
+  api.redraw()
+}
+
+// Confirm remove: `owl project remove -- <name>`, then the list again.
+async function removeProject(api: Api, name: string) {
+  removing = ''
+  await api.act(['project', 'remove', '--', name])
+  await loadProjects(api)
+  api.redraw()
+}
+
 // The version line comes from `owl --version` (`owl 0.3.0`); entering the tab also drops a
-// pending uninstall question and reloads the harnesses.
+// pending uninstall or remove question and reloads the harnesses and the projects.
 enter.settings = async (api) => {
   confirming = false
+  removing = ''
   const r = await api.owl(['--version'])
   version = r.ok ? r.out : ''
   await loadHarnesses(api)
+  await loadProjects(api)
 }
 
 // `Live watch` flips the wake-on-message switch and says what changes when.
@@ -178,6 +234,7 @@ const Title = ({ c, text, sub }: { c: Ctx; text: string; sub?: string }) => (
 export const settings: View = (c) => {
   const { Box, Text, Button, Input } = c.ui
   const chosen = chosenHarness()
+  const picked = chosenProject()
   // One `x` on the screen (two on one hotkey: the later wins): the selected harness row's
   // Remove holds it while the ring is on that row or its actions, the daemon's Uninstall
   // (which still asks first) holds it otherwise.
@@ -261,6 +318,49 @@ export const settings: View = (c) => {
           ) : null}
         </Box>
         <Box flexDirection="column">
+          <Title c={c} text="Projects" sub="which checkout answers for which project" />
+          {projects.length === 0 ? (
+            <Box paddingLeft={2}><Text color={P.secondary}>No projects registered. Add one below: a path (empty = this session's directory), then Enter.</Text></Box>
+          ) : (
+            projects.map((x) => {
+              const on = x === picked
+              return (
+                <Box key={`project-${x.name}`} flexDirection="row" height={1} overflow="hidden" backgroundColor={on ? P.selected : undefined}>
+                  <Box width={2} flexShrink={0}><Text color={P.accent}>{on ? SIGN.selected : ' '}</Text></Box>
+                  <Box flexShrink={0}>
+                    <Button key={`project-row-${x.name}`} plain label={line(x.name)} onPress={() => { project = x.name; c.api.redraw() }} />
+                  </Box>
+                  <Box flexGrow={1} flexShrink={1}>
+                    <Text color={P.secondary} wrap="truncate">{line(` → ${x.path}`)}</Text>
+                  </Box>
+                  {x.exists ? null : <Box flexShrink={0}><Text color={P.bad}>{`${SIGN.bad} missing`}</Text></Box>}
+                </Box>
+              )
+            })
+          )}
+          {picked ? (
+            <Box flexDirection="row" flexWrap="wrap" columnGap={2} paddingLeft={2}>
+              {removing === picked.name ? (
+                <Box flexDirection="row" columnGap={2}>
+                  <Text color={P.wait}>{line(`Remove project ${picked.name}?`)}</Text>
+                  <Button key="project-remove-confirm" plain label="Confirm remove" onPress={() => void removeProject(c.api, picked.name)} />
+                  <Button key="project-remove-cancel" plain label="Cancel" onPress={() => { removing = ''; c.api.redraw() }} />
+                </Box>
+              ) : (
+                <Button key="project-remove" plain hotkey="r" label={line(`Remove ${picked.name}`)} onPress={() => { removing = picked.name; c.api.redraw() }} />
+              )}
+            </Box>
+          ) : null}
+          <Box flexDirection="column" paddingLeft={2}>
+            <Field c={c} k="project-path" label="Path" hotkey="p" hint="(@ in the prompt box, then p · empty = this session's directory)"
+              onLabel={() => void pickPath(c.api)} placeholder="e.g. ../other-checkout or /code/app" value={projectPath}
+              set={(v) => { projectPath = v }} onSubmit={() => void addProject(c.api)} />
+            <Field c={c} k="project-name" label="Name" hotkey="n" hint="(optional)" placeholder="empty = origin remote as host/org/repo, else the directory name"
+              value={projectName} set={(v) => { projectName = v }} onSubmit={() => void addProject(c.api)} />
+            <Button key="project-add" plain label="Add project" onPress={() => void addProject(c.api)} />
+          </Box>
+        </Box>
+        <Box flexDirection="column">
           <Title c={c} text="Daemon" />
           <Row c={c} label="Service">
             {s.presence ? (
@@ -312,7 +412,7 @@ export const settings: View = (c) => {
         </Box>
       </Box>
     ),
-    keys: [['tab', 'move'], ['↑↓', 'scroll'], ['enter', 'use for drafts'], ['e', 'edit'], ['s', 'scan'], ['a', 'add'], ['d', 'doctor'], ['u', 'update']],
+    keys: [['tab', 'move'], ['↑↓', 'scroll'], ['enter', 'use for drafts'], ['e', 'edit'], ['s', 'scan'], ['a', 'add'], ['p', 'project path'], ['n', 'project name'], ['r', 'remove project'], ['d', 'doctor'], ['u', 'update']],
     note: 'switches are stored in plugin.json of the owlpost home',
   }
 }

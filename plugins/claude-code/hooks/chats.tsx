@@ -288,7 +288,7 @@ function messages(events: Ev[]): Ev[] {
 // The panel's fields have no `@` file completion (the engine's Input has none), so a file is
 // picked in the prompt box, which has it: the newest `@file` there (`@"a b.rs"` too; not an
 // `@owl:` mention), '' when there is none.
-async function promptFile(api: Api): Promise<string> {
+export async function promptFile(api: Api): Promise<string> {
   const found = [...(await api.promptText()).matchAll(/(?:^|\s)@(?:"([^"]+)"|(\S+))/g)]
     .map((m) => m[1] ?? m[2])
     .filter((f) => !f.startsWith('owl:'))

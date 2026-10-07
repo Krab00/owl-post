@@ -196,12 +196,21 @@ enum Cmd {
     },
     /// Uninstall the service
     Uninstall,
+    /// Stop the installed service (the unit stays; `owl start` brings it back)
+    Stop,
+    /// Start the installed service again
+    Start,
     /// Check key, config, endpoints, harnesses, daemon
     Doctor,
     /// Harness table of config.json: list | scan | add | edit | remove | use
     Harness {
         #[command(subcommand)]
         cmd: HarnessCmd,
+    },
+    /// Projects peers can ask about (config.json projects): add | list | remove
+    Project {
+        #[command(subcommand)]
+        cmd: ProjectCmd,
     },
     /// MCP server over stdio: the contact book as `to://` resources (Claude Code `@owl:` mentions)
     Mcp,
@@ -252,6 +261,22 @@ enum HarnessCmd {
     Remove { name: String },
     /// The harness that drafts answers (responder.harness)
     Use { name: String },
+}
+
+#[derive(Subcommand)]
+enum ProjectCmd {
+    /// Map a checkout (default: the current directory) under a project key
+    Add {
+        path: Option<PathBuf>,
+        /// The key peers ask about (default: what `owl ask` sends from there — the origin
+        /// remote as host/org/repo, else the directory name)
+        #[arg(long)]
+        name: Option<String>,
+    },
+    /// One row per project: name, checkout, `missing` when the checkout is gone
+    List,
+    /// Unmap a project
+    Remove { name: String },
 }
 
 #[derive(Subcommand)]
@@ -561,8 +586,11 @@ fn main() -> ExitCode {
             cli::install::owl_path().and_then(|owl| cli::install::install(&home, dry_run, &owl))
         }
         Cmd::Uninstall => cli::install::uninstall(),
+        Cmd::Stop => cli::install::stop_service(),
+        Cmd::Start => cli::install::start_service(),
         Cmd::Doctor => cli::doctor::run(&home, cli.json),
         Cmd::Harness { cmd } => cli::harness::run(&home, cmd, cli.json),
+        Cmd::Project { cmd } => cli::project::run(&home, cmd, cli.json),
         Cmd::Mcp => cli::mcp::run(&home),
         Cmd::Setup {
             name,

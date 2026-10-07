@@ -208,6 +208,17 @@ test('/owlpost:panel opens the pane, and closes it while it is open', async ($, 
   expect(await activeTab($)).toBe('Chats 0')
 })
 
+test('/owlpost:stop closes an open pane and still runs as a command', async ($, on) => {
+  const { opened, closed } = world(on, { unseen: 0 })
+  const stop = () =>
+    $.command.run({ command: 'owlpost:stop', args: '', origin: { kind: 'composer' }, presentation: { isFullscreen: true, columns: 200 } })
+  await stop() // pane closed: nothing to close
+  expect([opened, closed]).toEqual([[], []])
+  await panel($)
+  await stop()
+  expect([opened, closed]).toEqual([['owlpost'], ['owlpost']])
+})
+
 test('plugin.json that is not JSON, or a band that is not a bool, keeps the band on and the watch off', async ($, on) => {
   const stored: { value: unknown } = { value: '{not json' }
   world(on, { unseen: 1, stored })
@@ -469,7 +480,7 @@ test("pressing the open tab's own digit keeps that tab and its screen", async ($
       await press($, own!.key!, surface)
       expect(await activeTab($)).toBe(label)
       expect(await texts($, surface)).toEqual(before)
-      expect(calls(rec, from).filter((a) => !/^(card|--version|harness list)( |$)/.test(a))).toEqual([])
+      expect(calls(rec, from).filter((a) => !/^(card|--version|harness list|project list)( |$)/.test(a))).toEqual([])
     }
   }
 })

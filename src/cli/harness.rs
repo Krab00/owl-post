@@ -72,7 +72,7 @@ impl Env {
 /// Read `config.json` as raw JSON (a missing file is `{}`), apply `change` and write it back
 /// the way `Config::save` does. Mutators go through this instead of `Config::save`, which
 /// would drop unknown keys, write out every default and canonicalise `memory_root`.
-fn edit_raw(
+pub(super) fn edit_raw(
     home: &Path,
     change: impl FnOnce(&mut Value) -> anyhow::Result<()>,
 ) -> anyhow::Result<()> {
@@ -84,8 +84,8 @@ fn edit_raw(
     };
     change(&mut raw)?;
     std::fs::create_dir_all(home).with_context(|| format!("creating {}", home.display()))?;
-    std::fs::write(&path, serde_json::to_vec_pretty(&raw)?)
-        .with_context(|| format!("writing {}", path.display()))
+    // `<path>.tmp` + rename, so a crash never leaves a half-written config.
+    owlpost::daemon::write_atomic(home, "config.json", &serde_json::to_vec_pretty(&raw)?)
 }
 
 /// The `harnesses` object of the raw document. A file without one still has the

@@ -1053,6 +1053,8 @@ fn every_subcommand_has_a_command() {
 /// 4. the exemptions: `panel.md` has no `allowed-tools` at all, and `watch.md` does not wrap `owl watch` at all — it
 ///    only reads and writes `plugin.json`, so its set is pinned exactly to [`WATCH_TOOLS`]
 ///    here and checked in detail by `watch_command_is_a_plugin_json_toggle`.
+/// 5. `stop.md` and `start.md` also flip the watch in `plugin.json`, so `Read` and `Write`
+///    are allowed there besides their own `owl stop` / `owl start`.
 #[test]
 fn commands_have_descriptions() {
     let subs = help_subcommands(&[]);
@@ -1096,6 +1098,9 @@ fn commands_have_descriptions() {
             }
             // Every command runs in a subagent (the "Subagent only" preamble).
             if entry == "Agent" {
+                continue;
+            }
+            if (entry == "Read" || entry == "Write") && (name == "stop" || name == "start") {
                 continue;
             }
             let x = entry
@@ -1153,6 +1158,7 @@ fn commands_have_descriptions() {
         "delete",
         "ping",
         "harness",
+        "project",
     ]
     .to_vec();
     for sub in &subs {
@@ -1223,6 +1229,47 @@ fn trust_changing_commands_confirm_before_running() {
     let (_, edit) = frontmatter("commands/edit.md");
     assert!(edit.contains("$EDITOR"), "{edit}");
     assert!(edit.contains("Do not run it here"), "{edit}");
+}
+
+/// `/owlpost:stop` switches the watch off and runs `owl stop`, in that order; the mod closes
+/// the panel. `/owlpost:start` is the mirror.
+#[test]
+fn stop_and_start_commands_flip_the_watch_and_the_service() {
+    for (name, value, line) in [
+        (
+            "stop",
+            "false",
+            "`owlpost stopped: watch off, <owl stop's line>`",
+        ),
+        (
+            "start",
+            "true",
+            "`owlpost started: watch on, <owl start's line>`",
+        ),
+    ] {
+        let rel = format!("commands/{name}.md");
+        let (fm, body) = frontmatter(&rel);
+        assert_eq!(
+            fm_value(&fm, "allowed-tools"),
+            Some(format!("Agent, Read, Write, Bash(owl {name}:*)").as_str()),
+            "{rel}"
+        );
+        let watch = body
+            .find(&format!("set `watch` to `{value}`"))
+            .unwrap_or_else(|| panic!("{rel}: never sets watch {value}"));
+        let run = body
+            .find(&format!("Run `owl {name}`"))
+            .unwrap_or_else(|| panic!("{rel}: never runs owl {name}"));
+        assert!(watch < run, "{rel}: the watch flips before the service");
+        assert!(
+            body.contains("${OWLPOST_HOME:-$HOME/.config/owlpost}"),
+            "{rel}"
+        );
+        assert!(body.contains(line), "{rel}: lacks {line}");
+    }
+    let (_, stop) = frontmatter("commands/stop.md");
+    assert!(stop.contains("has already closed the panel"), "{stop}");
+    assert!(read("hooks/owlpost.tsx").contains("command: 'owlpost:stop'"));
 }
 
 // ---------- /owlpost:watch ----------
