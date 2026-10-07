@@ -21,8 +21,34 @@ pub fn run(home: &Path, cmd: ProjectCmd, json: bool) -> anyhow::Result<()> {
                 .ok()
                 .filter(|d| d.is_dir())
                 .ok_or_else(|| user_error(format!("{} is not a directory", path.display())))?;
-            // The same key `owl ask` sends from this checkout.
-            let name = name.unwrap_or_else(|| super::ask::detect_project(&dir));
+            // A harness runs read-only in the checkout; the owlpost home holds the key.
+            if let Ok(h) = std::fs::canonicalize(home)
+                && h.starts_with(&dir)
+            {
+                return Err(user_error(format!(
+                    "{} contains the owlpost home {}",
+                    dir.display(),
+                    h.display()
+                )));
+            }
+            let name = match name {
+                Some(n) => {
+                    let n = n.trim().to_string();
+                    if n.starts_with('/')
+                        || n.contains('\\')
+                        || n.contains("..")
+                        || n.chars().any(char::is_control)
+                        || n.chars().count() > 200
+                    {
+                        return Err(user_error(
+                            "the project name must be one line of at most 200 characters, without \\, .. or a leading /",
+                        ));
+                    }
+                    n
+                }
+                // The same key `owl ask` sends from this checkout.
+                None => super::ask::detect_project(&dir),
+            };
             if name.trim().is_empty() {
                 return Err(user_error("the project name is empty"));
             }

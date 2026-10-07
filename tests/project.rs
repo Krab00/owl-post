@@ -77,6 +77,13 @@ fn add_list_remove_change_config_json() {
         out,
         format!("updated github.com/org/repo → {}\n", canon(&plain))
     );
+    // `--name` is saved trimmed.
+    let out = stdout(&owl(
+        home.path(),
+        &repo,
+        &["project", "add", "--name", "  spaced  "],
+    ));
+    assert_eq!(out, format!("added spaced → {}\n", canon(&repo)));
     let cfg = Config::load(home.path()).unwrap();
     assert_eq!(cfg.projects["plain"], canon(&plain));
     assert_eq!(cfg.projects["github.com/org/repo"], canon(&plain));
@@ -91,6 +98,24 @@ fn add_list_remove_change_config_json() {
         assert_eq!(out.status.code(), Some(1), "{bad}");
         let err = String::from_utf8_lossy(&out.stderr);
         assert!(err.contains(&format!("{bad} is not a directory")), "{err}");
+    }
+    let long = "x".repeat(201);
+    for bad in ["../up", "/abs", "a\\b", "a\nb", long.as_str()] {
+        let out = owl(home.path(), &repo, &["project", "add", "--name", bad]);
+        assert_eq!(out.status.code(), Some(1), "{bad}");
+        let err = String::from_utf8_lossy(&out.stderr);
+        assert!(err.contains("at most 200 characters"), "{err}");
+    }
+    // A checkout that is, or contains, the owlpost home.
+    for dir in [home.path(), home.path().parent().unwrap()] {
+        let out = owl(
+            home.path(),
+            work.path(),
+            &["project", "add", dir.to_str().unwrap()],
+        );
+        assert_eq!(out.status.code(), Some(1), "{dir:?}");
+        let err = String::from_utf8_lossy(&out.stderr);
+        assert!(err.contains("contains the owlpost home"), "{err}");
     }
     let out = owl(home.path(), work.path(), &["project", "remove", "nope"]);
     assert_eq!(out.status.code(), Some(1));

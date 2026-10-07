@@ -102,8 +102,9 @@ pub fn project_dir(config: &Config, project: &str) -> anyhow::Result<PathBuf> {
 
 /// Where a plain question about a project this machine does not map runs: an empty
 /// directory outside the owlpost home (which holds the key, and a read-only harness can read
-/// `..`), never a checkout. Refused when it would still land inside the home.
-pub fn no_project_dir(home: &Path) -> anyhow::Result<PathBuf> {
+/// `..`), never a checkout. Refused when it would still land inside the home or a registered
+/// checkout.
+pub fn no_project_dir(home: &Path, config: &Config) -> anyhow::Result<PathBuf> {
     let dir = no_project_path(std::env::var_os("XDG_CACHE_HOME"), std::env::var_os("HOME"));
     std::fs::create_dir_all(&dir).with_context(|| format!("creating {}", dir.display()))?;
     let dir = std::fs::canonicalize(&dir)?;
@@ -115,6 +116,13 @@ pub fn no_project_dir(home: &Path) -> anyhow::Result<PathBuf> {
             dir.display(),
             home.display()
         );
+    }
+    for (name, checkout) in &config.projects {
+        if let Ok(checkout) = std::fs::canonicalize(checkout)
+            && dir.starts_with(&checkout)
+        {
+            bail!("{} is inside the checkout of {name}", dir.display());
+        }
     }
     Ok(dir)
 }
@@ -271,7 +279,7 @@ pub fn draft_with(
     // A plain question about a project this machine does not map (the daemon admits only
     // those without a path) runs outside any checkout.
     let cwd = if path.is_none() && !config.projects.contains_key(project) {
-        no_project_dir(home)?
+        no_project_dir(home, config)?
     } else {
         project_dir(config, project)?
     };
@@ -1001,6 +1009,7 @@ mod tests {
     /// outside the owlpost home, not a checkout; with a path it is still `unknown project`.
     #[test]
     fn unconfigured_project_runs_in_the_neutral_dir() {
+        let (_lock, _cache) = temp_cache_home();
         let home = tempfile::tempdir().unwrap();
         let mut cfg = cfg();
         cfg.projects.clear();
@@ -1010,7 +1019,7 @@ mod tests {
         cfg.responder.harness = "fake".into();
         let d = draft(&cfg, home.path(), None, "github.com/else/where", None, "q").unwrap();
         let ran_in = Path::new(&d.text).canonicalize().unwrap();
-        assert_eq!(ran_in, no_project_dir(home.path()).unwrap());
+        assert_eq!(ran_in, no_project_dir(home.path(), &cfg).unwrap());
         assert!(ran_in.ends_with("owlpost/no-project"), "{ran_in:?}");
         assert!(!ran_in.starts_with(home.path().canonicalize().unwrap()));
         let e = draft(
@@ -1042,13 +1051,31 @@ mod tests {
         );
     }
 
-    /// The neutral directory is refused when it would sit inside the owlpost home.
+    /// Points `XDG_CACHE_HOME` at a fresh tempdir for one test, so the neutral directory never
+    /// lands in the real `~/.cache`. The guard serialises the tests that read the variable.
+    fn temp_cache_home() -> (std::sync::MutexGuard<'static, ()>, tempfile::TempDir) {
+        static ENV: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let lock = ENV.lock().unwrap_or_else(|e| e.into_inner());
+        let cache = tempfile::tempdir().unwrap();
+        // SAFETY: every test that reads XDG_CACHE_HOME holds the lock.
+        unsafe { std::env::set_var("XDG_CACHE_HOME", cache.path()) };
+        (lock, cache)
+    }
+
+    /// The neutral directory is refused when it would sit inside the owlpost home or inside a
+    /// registered checkout.
     #[test]
     fn no_project_dir_is_never_inside_the_home() {
-        let cache = no_project_path(std::env::var_os("XDG_CACHE_HOME"), std::env::var_os("HOME"));
-        let home = cache.parent().unwrap().parent().unwrap();
-        let e = no_project_dir(home).unwrap_err().to_string();
+        let (_lock, cache) = temp_cache_home();
+        let mut cfg = cfg();
+        cfg.projects.clear();
+        let e = no_project_dir(cache.path(), &cfg).unwrap_err().to_string();
         assert!(e.contains("inside the owlpost home"), "{e}");
+        let home = tempfile::tempdir().unwrap();
+        cfg.projects
+            .insert("p".into(), cache.path().to_string_lossy().into());
+        let e = no_project_dir(home.path(), &cfg).unwrap_err().to_string();
+        assert!(e.contains("inside the checkout of p"), "{e}");
     }
 
     #[test]

@@ -1,5 +1,5 @@
 ---
-description: Stop owlpost on this machine without uninstalling — close the panel, switch the live watch off, stop the daemon service
+description: Stop owlpost on this machine without uninstalling — close the panel, switch the live watch off for new sessions, stop the daemon service
 allowed-tools: Agent, Read, Write, Bash(owl stop:*)
 ---
 
