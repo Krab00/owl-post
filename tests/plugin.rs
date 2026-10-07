@@ -1153,6 +1153,7 @@ fn commands_have_descriptions() {
         "delete",
         "ping",
         "harness",
+        "project",
     ]
     .to_vec();
     for sub in &subs {

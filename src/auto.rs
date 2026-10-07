@@ -208,7 +208,7 @@ impl Scheduler {
             let st = state.clone();
             let rid = id.clone();
             let result = tokio::task::spawn_blocking(move || {
-                attempt(&st.home, &st.cwd, &st.config, &st.spool, &rid)
+                attempt(&st.home, &st.cwd, &st.config_now(), &st.spool, &rid)
             })
             .await;
             sched.release(&id);

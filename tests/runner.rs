@@ -954,7 +954,9 @@ fn fences_in_context_and_history_are_neutralised() {
 /// and an injected instruction stays inside the `File` block.
 #[test]
 fn file_path_is_fenced_and_unfenced() {
-    let env = Env::new();
+    let mut env = Env::new();
+    // A mapped project: an unmapped one is left out of the prompt.
+    env.cfg.projects.insert("proj".into(), "/checkout".into());
     let p = build_prompt_with(
         &env.cfg,
         env.home.path(),
@@ -1029,7 +1031,9 @@ fn a_question_without_a_context_id_gets_no_history() {
 /// Unit row: the literal layout of both blocks, and that the default extras change nothing.
 #[test]
 fn build_prompt_with_renders_both_blocks_verbatim() {
-    let env = Env::new();
+    let mut env = Env::new();
+    // A mapped project: an unmapped one is left out of the prompt.
+    env.cfg.projects.insert("proj".into(), "/checkout".into());
     let history = [
         ("Q1".to_string(), "A1".to_string()),
         ("Q2".to_string(), "A2".to_string()),

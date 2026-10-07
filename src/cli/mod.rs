@@ -18,6 +18,7 @@ pub mod inbox;
 pub mod install;
 pub mod mcp;
 pub mod presence;
+pub mod project;
 pub mod reject;
 pub mod request;
 pub mod route;

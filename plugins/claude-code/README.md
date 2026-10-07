@@ -58,6 +58,7 @@ patterns of the next steps a file runs itself); `tests/plugin.rs` pins the rule.
 | `/owlpost:uninstall` | `commands/uninstall.md` | `owl uninstall` — remove the service (confirms first) |
 | `/owlpost:doctor` | `commands/doctor.md` | `owl doctor` — check the setup, offer the fix per failure |
 | `/owlpost:harness <list\|scan\|add\|edit\|remove\|use> ...` | `commands/harness.md` | `owl harness` — the harness table of config.json |
+| `/owlpost:project add [path] [--name <key>] \| list \| remove <name>` | `commands/project.md` | `owl project` — the projects table of config.json (which checkout answers for which project) |
 | `/owlpost:update [--source <dir>]` | `commands/update.md` | `owl update` — replaces the running binary in place, daemon, plugin |
 
 ## Mention a contact

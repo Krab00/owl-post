@@ -278,11 +278,12 @@ pub fn draft(
 ) -> anyhow::Result<(Record, runner::Draft)> {
     let payload = payload_of(id, &rec)?;
     let (project, path, question) = question_body(id, &payload)?;
-    // The `Project:` line and the notes path carry the project unfenced: only one the owner
-    // configured, as [`draft`] demands (the daemon refuses others; a record from before that
-    // rule still stops here).
+    // A path only means something inside a configured checkout; a plain question about a
+    // project this machine does not map is answered outside any checkout, the name left out
+    // of the prompt (`runner::build_prompt_with`). The daemon refuses the rest; a record from
+    // before that rule still stops here.
     anyhow::ensure!(
-        config.projects.contains_key(project),
+        config.projects.contains_key(project) || path.is_none(),
         "unknown project {project}"
     );
     let history = thread_history_of(home, id, &payload)?;
@@ -309,11 +310,12 @@ pub fn draft(
 pub fn prompt(config: &Config, home: &Path, id: &str, rec: &Record) -> anyhow::Result<String> {
     let payload = payload_of(id, rec)?;
     let (project, path, question) = question_body(id, &payload)?;
-    // The `Project:` line and the notes path carry the project unfenced: only one the owner
-    // configured, as [`draft`] demands (the daemon refuses others; a record from before that
-    // rule still stops here).
+    // A path only means something inside a configured checkout; a plain question about a
+    // project this machine does not map is answered outside any checkout, the name left out
+    // of the prompt (`runner::build_prompt_with`). The daemon refuses the rest; a record from
+    // before that rule still stops here.
     anyhow::ensure!(
-        config.projects.contains_key(project),
+        config.projects.contains_key(project) || path.is_none(),
         "unknown project {project}"
     );
     let history = thread_history_of(home, id, &payload)?;

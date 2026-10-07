@@ -61,6 +61,7 @@ fn help_lists_all_subcommands() {
         "uninstall",
         "doctor",
         "harness",
+        "project",
         "mcp",
         "setup",
         "update",

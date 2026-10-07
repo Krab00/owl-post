@@ -203,6 +203,11 @@ enum Cmd {
         #[command(subcommand)]
         cmd: HarnessCmd,
     },
+    /// Projects peers can ask about (config.json projects): add | list | remove
+    Project {
+        #[command(subcommand)]
+        cmd: ProjectCmd,
+    },
     /// MCP server over stdio: the contact book as `to://` resources (Claude Code `@owl:` mentions)
     Mcp,
     /// One-shot first install: init (if no key), install the daemon, install the Claude Code plugin
@@ -252,6 +257,22 @@ enum HarnessCmd {
     Remove { name: String },
     /// The harness that drafts answers (responder.harness)
     Use { name: String },
+}
+
+#[derive(Subcommand)]
+enum ProjectCmd {
+    /// Map a checkout (default: the current directory) under a project key
+    Add {
+        path: Option<PathBuf>,
+        /// The key peers ask about (default: what `owl ask` sends from there — the origin
+        /// remote as host/org/repo, else the directory name)
+        #[arg(long)]
+        name: Option<String>,
+    },
+    /// One row per project: name, checkout, `missing` when the checkout is gone
+    List,
+    /// Unmap a project
+    Remove { name: String },
 }
 
 #[derive(Subcommand)]
@@ -563,6 +584,7 @@ fn main() -> ExitCode {
         Cmd::Uninstall => cli::install::uninstall(),
         Cmd::Doctor => cli::doctor::run(&home, cli.json),
         Cmd::Harness { cmd } => cli::harness::run(&home, cmd, cli.json),
+        Cmd::Project { cmd } => cli::project::run(&home, cmd, cli.json),
         Cmd::Mcp => cli::mcp::run(&home),
         Cmd::Setup {
             name,

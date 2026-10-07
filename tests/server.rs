@@ -328,6 +328,44 @@ async fn question_is_accepted_and_spooled() {
     b.running.shutdown();
 }
 
+/// A plain question (no path) about a project this machine does not map is accepted; one
+/// with a path is still `unknown project` until `owl project add` maps it, which the running
+/// daemon picks up without a restart.
+#[tokio::test]
+async fn unknown_project_is_accepted_only_without_a_path() {
+    let a = id(1);
+    let b = spawn_daemon(
+        2,
+        true,
+        &[Peer::new(&a, "Ana", Some(policy(Mode::Manual, None)))],
+    )
+    .await;
+    let cl = client(Some(&a), &b.id);
+    let other = "github.com/someone/else";
+    let plain = Payload::question(&fp(&a), &b.fp(), other, None, "how do you deploy?");
+    let raw = plain.to_signed_bytes();
+    let resp = post_raw(&cl, &b, raw.clone(), Some(&sig_over(&a, &raw))).await;
+    assert_eq!(resp.status(), 202);
+    assert_eq!(inbox_ids(&b), vec![plain.id.clone()]);
+
+    let with_path = Payload::question(&fp(&a), &b.fp(), other, Some("src/x.rs"), "why?");
+    let raw = with_path.to_signed_bytes();
+    let resp = post_raw(&cl, &b, raw.clone(), Some(&sig_over(&a, &raw))).await;
+    assert_error(resp, 400, "unknown project").await;
+
+    // Mapped on disk while the daemon runs: the same question now gets through.
+    let mut cfg = owlpost::config::Config::load(b.home()).unwrap();
+    cfg.projects
+        .insert(other.into(), b.home().to_string_lossy().into_owned());
+    cfg.save(b.home()).unwrap();
+    let with_path = Payload::question(&fp(&a), &b.fp(), other, Some("src/x.rs"), "why?");
+    let raw = with_path.to_signed_bytes();
+    let resp = post_raw(&cl, &b, raw.clone(), Some(&sig_over(&a, &raw))).await;
+    assert_eq!(resp.status(), 202);
+    assert_eq!(inbox_ids(&b).len(), 2);
+    b.running.shutdown();
+}
+
 #[tokio::test]
 async fn no_policy_means_consent() {
     let (a, c) = (id(1), id(3));

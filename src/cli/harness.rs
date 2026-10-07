@@ -72,7 +72,7 @@ impl Env {
 /// Read `config.json` as raw JSON (a missing file is `{}`), apply `change` and write it back
 /// the way `Config::save` does. Mutators go through this instead of `Config::save`, which
 /// would drop unknown keys, write out every default and canonicalise `memory_root`.
-fn edit_raw(
+pub(super) fn edit_raw(
     home: &Path,
     change: impl FnOnce(&mut Value) -> anyhow::Result<()>,
 ) -> anyhow::Result<()> {
