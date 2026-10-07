@@ -48,6 +48,10 @@ fn git(dir: &Path, args: &[&str]) {
         .env("GIT_AUTHOR_EMAIL", "t@example.org")
         .env("GIT_COMMITTER_NAME", "T")
         .env("GIT_COMMITTER_EMAIL", "t@example.org")
+        // Fixed dates: every fixture repo gets the same shas, so a sha taken from one
+        // resolves in another (`draft_at_an_older_ref_serves_that_commits_content`).
+        .env("GIT_AUTHOR_DATE", "2026-01-01T00:00:00Z")
+        .env("GIT_COMMITTER_DATE", "2026-01-01T00:00:00Z")
         .output()
         .unwrap();
     assert!(
@@ -736,7 +740,8 @@ fn draft_at_an_older_ref_serves_that_commits_content() {
         )
         .unwrap()
     };
-    // The two fixtures are separate repos, so compare the content, not the sha.
+    // The two fixtures are separate repos (same shas: `git` pins the dates), so compare
+    // the content, not the sha.
     assert_eq!(at(&d).text, TIP.replace("api_key: hunter2", "[redacted]"));
     assert_eq!(
         at(&d2).text,
