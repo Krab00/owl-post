@@ -35,7 +35,7 @@ is in a session. `/owlpost:me` is `owl contact export`, `/owlpost:contacts` is t
 over `owl contact list` ending with the `@owl:to://` mention hint.
 
 - Setup: `/owlpost:setup` (init + daemon + plugin in one go), `/owlpost:init`, `/owlpost:whoami`, `/owlpost:me`, `/owlpost:card`,
-  `/owlpost:install`, `/owlpost:uninstall`, `/owlpost:doctor`, `/owlpost:harness`, `/owlpost:project`, `/owlpost:update`
+  `/owlpost:install`, `/owlpost:uninstall`, `/owlpost:stop`, `/owlpost:start`, `/owlpost:doctor`, `/owlpost:harness`, `/owlpost:project`, `/owlpost:update`
 - Contacts and trust: `/owlpost:contacts`, `/owlpost:contact`, `/owlpost:add`,
   `/owlpost:presence`, `/owlpost:ping`, `/owlpost:allow`, `/owlpost:deny`
 - Asking: `/owlpost:ask`, `/owlpost:request` (one file at a ref, or one memory entry), `/owlpost:call` (run one tool of their registry),

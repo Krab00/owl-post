@@ -59,6 +59,8 @@ fn help_lists_all_subcommands() {
         "daemon",
         "install",
         "uninstall",
+        "stop",
+        "start",
         "doctor",
         "harness",
         "project",

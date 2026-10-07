@@ -56,6 +56,8 @@ patterns of the next steps a file runs itself); `tests/plugin.rs` pins the rule.
 | `/owlpost:setup [--name] [--email] [--plugin-source] [--dry-run]` | `commands/setup.md` | `owl setup` — init, daemon, plugin in one go |
 | `/owlpost:install [--dry-run]` | `commands/install.md` | `owl install` — register the daemon service |
 | `/owlpost:uninstall` | `commands/uninstall.md` | `owl uninstall` — remove the service (confirms first) |
+| `/owlpost:stop` | `commands/stop.md` | stop owlpost without uninstalling: the mod closes the panel (with mods on), `{"watch": false}` in `plugin.json` as `/owlpost:watch off`, then `owl stop` — stops the daemon service and keeps its unit |
+| `/owlpost:start` | `commands/start.md` | the mirror of `/owlpost:stop`: `{"watch": true}` as `/owlpost:watch on`, then `owl start` |
 | `/owlpost:doctor` | `commands/doctor.md` | `owl doctor` — check the setup, offer the fix per failure |
 | `/owlpost:harness <list\|scan\|add\|edit\|remove\|use> ...` | `commands/harness.md` | `owl harness` — the harness table of config.json |
 | `/owlpost:project add [path] [--name <key>] \| list \| remove <name>` | `commands/project.md` | `owl project` — the projects table of config.json (which checkout answers for which project) |

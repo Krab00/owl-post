@@ -562,6 +562,11 @@ owl uninstall
 Stops and removes the daemon service; questions and answers stop flowing until you run
 `owl install` again. You should see `stopped <service>` and `removed <path>`.
 
+To pause without uninstalling, `owl stop` stops the service and keeps its unit (you should
+see `stopped owl daemon`) and `owl start` starts it again (`started owl daemon`); the next
+login starts it too. `/owlpost:stop` also closes the panel and switches the live watch off,
+`/owlpost:start` switches it back on.
+
 ### 5.3 Harnesses
 
 The harnesses are the agent CLIs that draft answers for you; the table lives in

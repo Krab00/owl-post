@@ -196,6 +196,10 @@ enum Cmd {
     },
     /// Uninstall the service
     Uninstall,
+    /// Stop the installed service (the unit stays; `owl start` brings it back)
+    Stop,
+    /// Start the installed service again
+    Start,
     /// Check key, config, endpoints, harnesses, daemon
     Doctor,
     /// Harness table of config.json: list | scan | add | edit | remove | use
@@ -582,6 +586,8 @@ fn main() -> ExitCode {
             cli::install::owl_path().and_then(|owl| cli::install::install(&home, dry_run, &owl))
         }
         Cmd::Uninstall => cli::install::uninstall(),
+        Cmd::Stop => cli::install::stop_service(),
+        Cmd::Start => cli::install::start_service(),
         Cmd::Doctor => cli::doctor::run(&home, cli.json),
         Cmd::Harness { cmd } => cli::harness::run(&home, cmd, cli.json),
         Cmd::Project { cmd } => cli::project::run(&home, cmd, cli.json),

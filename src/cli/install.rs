@@ -1,5 +1,6 @@
 //! `owl install [--dry-run]` / `owl uninstall` (§11): a launchd agent on macOS, a systemd user
 //! unit on Linux, running `owl daemon --home <home>` with the absolute path of this binary.
+//! `owl stop` / `owl start` stop and start the installed service, keeping its unit.
 //!
 //! `HOME` resolves `~` (tests point it at a temp dir); `OWLPOST_INSTALL_NO_LOAD=1` skips the
 //! `launchctl` / `systemctl` step so the file operations can be tested without a service
@@ -339,6 +340,61 @@ pub fn uninstall() -> anyhow::Result<()> {
     if os == Os::Linux && !no_load() {
         run("systemctl", &["--user".into(), "daemon-reload".into()])?;
     }
+    Ok(())
+}
+
+/// `owl stop`: stops the installed service and keeps its unit, so `owl start` (or the next
+/// login) brings it back. Nothing installed: says so, exit 0.
+pub fn stop_service() -> anyhow::Result<()> {
+    let os = Os::current()?;
+    let path = unit_path(os, &user_home()?);
+    if !path.exists() {
+        println!(
+            "no owl daemon service installed ({} is absent)",
+            path.display()
+        );
+        return Ok(());
+    }
+    if no_load() {
+        println!("stop skipped ({NO_LOAD_ENV} is set)");
+        return Ok(());
+    }
+    match os {
+        // Not loaded (already booted out): nothing to stop.
+        Os::MacOs => {
+            let target = format!("gui/{}/{LAUNCHD_LABEL}", uid()?);
+            if run("launchctl", &["print".into(), target]).is_ok() {
+                unload(os, &path)?;
+            }
+        }
+        Os::Linux => run(
+            "systemctl",
+            &["--user".into(), "stop".into(), SYSTEMD_UNIT.into()],
+        )?,
+    }
+    println!("stopped owl daemon");
+    Ok(())
+}
+
+/// `owl start`: starts the installed service again (loading it when `owl stop` booted it
+/// out). Nothing installed: an error pointing at `owl install`.
+pub fn start_service() -> anyhow::Result<()> {
+    let os = Os::current()?;
+    let path = unit_path(os, &user_home()?);
+    if !path.exists() {
+        bail!(
+            "no owl daemon service installed ({} is absent); run owl install",
+            path.display()
+        );
+    }
+    if no_load() {
+        println!("start skipped ({NO_LOAD_ENV} is set)");
+        return Ok(());
+    }
+    if start(os, false).is_err() {
+        load(os, &path)?;
+    }
+    println!("started owl daemon");
     Ok(())
 }
 
