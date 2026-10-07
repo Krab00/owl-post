@@ -480,7 +480,7 @@ test("pressing the open tab's own digit keeps that tab and its screen", async ($
       await press($, own!.key!, surface)
       expect(await activeTab($)).toBe(label)
       expect(await texts($, surface)).toEqual(before)
-      expect(calls(rec, from).filter((a) => !/^(card|--version|harness list)( |$)/.test(a))).toEqual([])
+      expect(calls(rec, from).filter((a) => !/^(card|--version|harness list|project list)( |$)/.test(a))).toEqual([])
     }
   }
 })

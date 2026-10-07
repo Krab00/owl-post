@@ -46,6 +46,9 @@ export type Presence = { last_pull_at: string; open_asks: number; peers_probed: 
 // One row of `owl harness list --json`.
 export type Harness = { name: string; cmd: string[]; answer_path: string; enabled: boolean; drafting: boolean; found: boolean; path: string | null }
 
+// One row of `owl project list --json`; `exists` is false when the checkout is gone.
+export type Project = { name: string; path: string; exists: boolean }
+
 // The `draft` of `owl show <id> --json`.
 export type Draft = { text: string; harness: string; drafted_at: string; redactions: number; status: string }
 

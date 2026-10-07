@@ -117,7 +117,9 @@ result) and the key hints. Colours are Claude Code theme keys, so they follow yo
   policy (auto / manual / never) or is removed after a confirmation; `n` adds a peer file.
 - **New**: ask a question, request a file or call a tool, as a new thread or continuing one.
 - **Card**: your card, **Copy peer file** for a colleague, and a colleague's card by name.
-- **Settings**: Live watch and the band (stored in `plugin.json`), doctor, install and
+- **Settings**: Live watch and the band (stored in `plugin.json`), the projects (`owl project`:
+  `name → path` rows, add a checkout — `p` takes the prompt box's `@path`, empty is the session's
+  directory —, `r` removes the selected one after a confirm), doctor, install and
   uninstall the daemon (uninstall asks first and has no key), update.
 
 Short ids on screen are the last six hex characters of the full id. To close the pane, run
